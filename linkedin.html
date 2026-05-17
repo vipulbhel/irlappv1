@@ -130,9 +130,16 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
       Continue with LinkedIn
     </button>
 
-    <p style="font-size:11px;color:var(--muted2);text-align:center;line-height:1.6">
-      By connecting, you agree that IRL can read your basic LinkedIn profile for verification purposes only.
-    </p>
+   <p style="font-size:11px;color:var(--muted2);text-align:center;line-height:1.6">
+  By connecting, you agree that IRL can read your basic LinkedIn profile for verification purposes only.
+</p>
+<p style="margin-top:16px;text-align:center">
+  <span 
+    onclick="window.location.href='index.html'" 
+    style="font-size:12px;color:var(--muted2);cursor:pointer;text-decoration:underline;text-underline-offset:3px">
+    Not now — go back to login
+  </span>
+</p>
   </div>
 
   <!-- SCREEN B: confirm identity — shown after LinkedIn returns -->
@@ -158,7 +165,8 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
 <script>
 const SUPABASE_URL = 'https://sxpbdkamagunvktdkogw.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4cGJka2FtYWd1bnZrdGRrb2d3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwMDc3NDUsImV4cCI6MjA5NDU4Mzc0NX0.rTQeSH2dWSLP0IxwewvvEn3qxIbRQcCMZVjpr_0_LJ8';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const { createClient } = window.supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const phone = localStorage.getItem('irl_phone');
 if (!phone) window.location.href = 'index.html';
@@ -201,12 +209,12 @@ window.addEventListener('load', async () => {
 // ── CONNECT LINKEDIN
 async function connectLinkedIn() {
   document.getElementById('loadingOverlay').classList.add('show');
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: 'linkedin_oidc',
-    options: {
-      redirectTo: window.location.href,
-    }
-  });
+  const { error } = await db.auth.signInWithOAuth({
+  provider: 'linkedin_oidc',
+  options: {
+    redirectTo: 'https://irl-v1.vercel.app/linkedin.html',
+  }
+});
   if (error) {
     document.getElementById('loadingOverlay').classList.remove('show');
     document.getElementById('errorMsg').textContent = 'Could not connect to LinkedIn. Try again.';
