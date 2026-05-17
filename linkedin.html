@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IRL — Connect LinkedIn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0D0810;--card:#160F1A;--rose:#E8437A;--rose2:#FF6B9D;
+  --cream:#F5EDE8;--muted:#8A7A82;--muted2:#3A3040;--border:rgba(245,237,232,0.08);
+  --linkedin:#0077B5;
+}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden}
+.amb1{position:fixed;top:-100px;right:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(232,67,122,0.1) 0%,transparent 65%);pointer-events:none;z-index:0}
+.amb2{position:fixed;bottom:-80px;left:-80px;width:300px;height:300px;background:radial-gradient(circle,rgba(120,40,90,0.07) 0%,transparent 65%);pointer-events:none;z-index:0}
+.card{width:100%;max-width:400px;background:var(--card);border:1px solid var(--border);border-radius:24px;padding:36px 28px;position:relative;z-index:1;animation:fadeup 0.6s ease forwards}
+.logo{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;letter-spacing:-1px;margin-bottom:32px;text-align:center}
+.logo span{color:var(--rose)}
+.card-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;letter-spacing:-0.5px;margin-bottom:6px;text-align:center}
+.card-sub{font-size:13px;color:var(--muted);text-align:center;line-height:1.6;margin-bottom:28px;font-weight:300}
+
+/* step indicator */
+.steps{display:flex;justify-content:center;gap:6px;margin-bottom:28px}
+.step-dot{width:6px;height:6px;border-radius:50%;background:var(--muted2)}
+.step-dot.active{background:var(--rose);width:20px;border-radius:3px}
+.step-dot.done{background:rgba(232,67,122,0.4)}
+
+/* why section */
+.why-box{background:rgba(245,237,232,0.03);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:24px}
+.why-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.why-item:last-child{margin-bottom:0}
+.why-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+.why-text{font-size:12px;color:var(--muted);line-height:1.5}
+.why-text b{color:var(--cream);font-weight:500}
+
+/* linkedin button */
+.btn-linkedin{
+  width:100%;
+  background:var(--linkedin);
+  border:none;border-radius:13px;
+  padding:17px 18px;
+  font-family:'Syne',sans-serif;
+  font-size:15px;font-weight:700;
+  color:white;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:transform 0.15s,opacity 0.15s;
+  margin-bottom:14px;
+  box-shadow:0 8px 28px rgba(0,119,181,0.25);
+}
+.btn-linkedin:hover{opacity:0.9;transform:scale(0.998)}
+.btn-linkedin:active{transform:scale(0.97)}
+.btn-linkedin svg{flex-shrink:0}
+
+/* confirm card — shown after LinkedIn returns */
+.confirm-card{display:none;background:rgba(245,237,232,0.04);border:1px solid rgba(232,67,122,0.2);border-radius:16px;padding:20px;margin-bottom:20px;text-align:center}
+.confirm-card.show{display:block;animation:fadeup 0.4s ease forwards}
+.confirm-avatar{width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid rgba(232,67,122,0.4);margin:0 auto 12px;display:block}
+.confirm-avatar-placeholder{width:72px;height:72px;border-radius:50%;background:rgba(232,67,122,0.1);border:2px solid rgba(232,67,122,0.3);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:28px}
+.confirm-name{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;letter-spacing:-0.3px;margin-bottom:3px}
+.confirm-headline{font-size:12px;color:var(--muted);margin-bottom:4px}
+.confirm-question{font-size:13px;color:var(--muted);margin-top:8px}
+.confirm-question b{color:var(--cream)}
+
+.btn-primary{width:100%;background:linear-gradient(135deg,var(--rose),#C4306A);border:none;border-radius:13px;padding:18px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:white;cursor:pointer;transition:transform 0.15s,opacity 0.15s,box-shadow 0.2s;box-shadow:0 8px 28px rgba(232,67,122,0.25);margin-bottom:10px}
+.btn-primary:hover{opacity:0.9;transform:scale(0.998)}
+.btn-primary:active{transform:scale(0.97)}
+.btn-secondary{width:100%;background:transparent;border:1px solid var(--border);border-radius:13px;padding:14px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--muted);cursor:pointer;transition:border-color 0.2s}
+.btn-secondary:hover{border-color:rgba(245,237,232,0.2)}
+
+.error-msg{display:none;background:rgba(232,67,122,0.08);border:1px solid rgba(232,67,122,0.2);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--rose2);margin-bottom:14px;text-align:center}
+.error-msg.show{display:block}
+
+.loading-overlay{display:none;position:fixed;inset:0;background:rgba(13,8,16,0.8);z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.loading-overlay.show{display:flex}
+.spinner{width:36px;height:36px;border:3px solid rgba(232,67,122,0.2);border-top-color:var(--rose);border-radius:50%;animation:spin 0.8s linear infinite}
+.loading-text{font-family:'Syne',sans-serif;font-size:14px;color:var(--muted)}
+
+@keyframes fadeup{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="amb1"></div>
+<div class="amb2"></div>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text">Connecting LinkedIn...</div>
+</div>
+
+<div class="card">
+  <div class="logo">ir<span>l</span></div>
+
+  <!-- step dots: step 1 of 2 in signup -->
+  <div class="steps">
+    <div class="step-dot done"></div>
+    <div class="step-dot active"></div>
+    <div class="step-dot"></div>
+  </div>
+
+  <!-- SCREEN A: connect LinkedIn -->
+  <div id="screenConnect">
+    <h1 class="card-title">Verify your identity</h1>
+    <p class="card-sub">Connect your LinkedIn so we know you're real. Your profile stays private — we only use it for verification.</p>
+
+    <div class="why-box">
+      <div class="why-item">
+        <span class="why-icon">🛡️</span>
+        <div class="why-text"><b>No fake profiles.</b> LinkedIn verification ensures every person on IRL is real.</div>
+      </div>
+      <div class="why-item">
+        <span class="why-icon">🔒</span>
+        <div class="why-text"><b>We don't post anything.</b> We only read your name, photo, and headline.</div>
+      </div>
+      <div class="why-item">
+        <span class="why-icon">✓</span>
+        <div class="why-text"><b>One time only.</b> You'll never need to reconnect.</div>
+      </div>
+    </div>
+
+    <div class="error-msg" id="errorMsg"></div>
+
+    <button class="btn-linkedin" onclick="connectLinkedIn()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      Continue with LinkedIn
+    </button>
+
+    <p style="font-size:11px;color:var(--muted2);text-align:center;line-height:1.6">
+      By connecting, you agree that IRL can read your basic LinkedIn profile for verification purposes only.
+    </p>
+  </div>
+
+  <!-- SCREEN B: confirm identity — shown after LinkedIn returns -->
+  <div id="screenConfirm" style="display:none">
+    <h1 class="card-title">Is this you?</h1>
+    <p class="card-sub">We pulled this from your LinkedIn. Confirm it's the right account.</p>
+
+    <div class="confirm-card show" id="confirmCard">
+      <div class="confirm-avatar-placeholder" id="avatarPlaceholder">👤</div>
+      <img class="confirm-avatar" id="confirmAvatar" style="display:none" src="" alt=""/>
+      <div class="confirm-name" id="confirmName">Loading...</div>
+      <div class="confirm-headline" id="confirmHeadline"></div>
+      <div class="confirm-question">Is this your LinkedIn account?</div>
+    </div>
+
+    <div class="error-msg" id="errorMsg2"></div>
+
+    <button class="btn-primary" onclick="confirmIdentity()">Yes, that's me →</button>
+    <button class="btn-secondary" onclick="resetLinkedIn()">No, use a different account</button>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://sxpbdkamagunvktdkogw.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4cGJka2FtYWd1bnZrdGRrb2d3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwMDc3NDUsImV4cCI6MjA5NDU4Mzc0NX0.rTQeSH2dWSLP0IxwewvvEn3qxIbRQcCMZVjpr_0_LJ8';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const phone = localStorage.getItem('irl_phone');
+if (!phone) window.location.href = 'index.html';
+
+// ── CHECK IF RETURNING FROM LINKEDIN OAUTH
+window.addEventListener('load', async () => {
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (session && session.user) {
+    // LinkedIn returned — show confirm screen
+    const user = session.user;
+    const meta = user.user_metadata || {};
+
+    // populate confirm card
+    const name = meta.full_name || meta.name || 'Your Name';
+    const avatar = meta.avatar_url || meta.picture || null;
+    const headline = meta.headline || meta.email || '';
+
+    document.getElementById('confirmName').textContent = name;
+    document.getElementById('confirmHeadline').textContent = headline;
+
+    if (avatar) {
+      document.getElementById('confirmAvatar').src = avatar;
+      document.getElementById('confirmAvatar').style.display = 'block';
+      document.getElementById('avatarPlaceholder').style.display = 'none';
+    }
+
+    // save to localStorage for profile screen
+    localStorage.setItem('irl_linkedin_name', name);
+    localStorage.setItem('irl_linkedin_avatar', avatar || '');
+    localStorage.setItem('irl_linkedin_headline', headline);
+    localStorage.setItem('irl_linkedin_uid', user.id);
+
+    // switch screens
+    document.getElementById('screenConnect').style.display = 'none';
+    document.getElementById('screenConfirm').style.display = 'block';
+  }
+});
+
+// ── CONNECT LINKEDIN
+async function connectLinkedIn() {
+  document.getElementById('loadingOverlay').classList.add('show');
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'linkedin_oidc',
+    options: {
+      redirectTo: window.location.href,
+    }
+  });
+  if (error) {
+    document.getElementById('loadingOverlay').classList.remove('show');
+    document.getElementById('errorMsg').textContent = 'Could not connect to LinkedIn. Try again.';
+    document.getElementById('errorMsg').classList.add('show');
+  }
+}
+
+// ── CONFIRM IDENTITY
+async function confirmIdentity() {
+  const btn = document.querySelector('.btn-primary');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  try {
+    const uid = localStorage.getItem('irl_linkedin_uid');
+    const name = localStorage.getItem('irl_linkedin_name');
+    const headline = localStorage.getItem('irl_linkedin_headline');
+
+    // update profile row
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        user_id: uid,
+        full_name: name,
+        linkedin_url: headline,
+        linkedin_verified: true,
+        onboarding_step: 1,
+      })
+      .eq('phone', phone);
+
+    if (error) throw error;
+
+    // go to profile setup
+    window.location.href = 'profile.html';
+  } catch(err) {
+    console.error(err);
+    document.getElementById('errorMsg2').textContent = 'Something went wrong. Try again.';
+    document.getElementById('errorMsg2').classList.add('show');
+    btn.disabled = false;
+    btn.textContent = 'Yes, that\'s me →';
+  }
+}
+
+// ── RESET — use different account
+async function resetLinkedIn() {
+  await supabase.auth.signOut();
+  document.getElementById('screenConfirm').style.display = 'none';
+  document.getElementById('screenConnect').style.display = 'block';
+}
+</script>
+</body>
+</html>
