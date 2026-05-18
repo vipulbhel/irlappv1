@@ -346,10 +346,37 @@ async function confirmIdentity(){
     const name     = localStorage.getItem('irl_li_name');
     const headline = localStorage.getItem('irl_li_headline');
 
+    // CHECK — has this LinkedIn ID been used before?
+    const { data: existing, error: checkError } = await db
+      .from('profiles')
+      .select('phone, linkedin_id')
+      .eq('linkedin_id', uid)
+      .limit(1);
+
+    if(checkError){
+      document.getElementById('errorConfirm').textContent = 'Error checking account. Try again.';
+      document.getElementById('errorConfirm').classList.add('show');
+      btn.textContent = "Yes, that's me →";
+      btn.disabled = false;
+      return;
+    }
+
+    // if found and it belongs to a DIFFERENT phone number — block it
+    if(existing && existing.length > 0 && existing[0].phone !== phone){
+      document.getElementById('errorConfirm').textContent = 
+        'This LinkedIn account is already linked to another IRL account. Each LinkedIn can only be used once.';
+      document.getElementById('errorConfirm').classList.add('show');
+      btn.textContent = "Yes, that's me →";
+      btn.disabled = false;
+      return;
+    }
+
+    // SAVE — update profile with LinkedIn data
     const { error } = await db
       .from('profiles')
       .update({
         user_id:           uid,
+        linkedin_id:       uid,
         full_name:         name,
         linkedin_url:      headline,
         linkedin_verified: true,
@@ -358,23 +385,24 @@ async function confirmIdentity(){
       .eq('phone', phone);
 
     if(error){
-      document.getElementById('errorConfirm').textContent = 'Save error: ' + (error.message || JSON.stringify(error));
+      document.getElementById('errorConfirm').textContent = 'Save error: ' + error.message;
       document.getElementById('errorConfirm').classList.add('show');
-      btn.textContent = 'Yes, that\'s me →';
+      btn.textContent = "Yes, that's me →";
       btn.disabled = false;
       return;
     }
 
     window.location.href = 'profile.html';
+
   } catch(err){
     console.error(err);
     document.getElementById('errorConfirm').textContent = 'Unexpected error. Try again.';
     document.getElementById('errorConfirm').classList.add('show');
-    btn.textContent = 'Yes, that\'s me →';
+    btn.textContent = "Yes, that's me →";
     btn.disabled = false;
   }
 }
-
+  
 // ── RESET
 async function resetAndRetry(){
   await db.auth.signOut();
