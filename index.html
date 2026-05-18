@@ -214,12 +214,7 @@ async function handleContinue(){
 
     const existing = rows && rows.length > 0 ? rows[0] : null;
 
-    if(existing){
-      redirectReturningUser(existing);
-    } else {
-      // brand new user
-      window.location.href = 'otp.html';
-    }
+    window.location.href = 'otp.html';
 
   } catch(err){
     console.error('handleContinue error:', err);
