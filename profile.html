@@ -311,7 +311,8 @@ input[type="file"]{display:none}
 <!-- TOP BAR -->
 <div class="topbar">
   <div class="topbar-row">
-    <div class="logo">ir<span>l</span></div>
+    <button id="backBtn" onclick="goBack()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:0;line-height:1;display:none">←</button>
+    <div class="logo" style="flex:1;text-align:center">ir<span>l</span></div>
     <div class="step-label" id="stepLabel">Step 1 of 5</div>
   </div>
   <div class="progress-bar" id="progressBar">
@@ -478,9 +479,9 @@ input[type="file"]{display:none}
         </div>
       </div>
     </div>
-    <button class="voice-redo" id="voiceRedo" onclick="resetRecording()" style="margin-top:10px">
-      🔄 Record again
-    </button>
+    <button class="voice-redo" id="voiceRedo" onclick="resetRecording()" style="margin-top:12px;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:rgba(245,237,232,0.04);border:1px solid rgba(245,237,232,0.12);border-radius:13px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--muted);cursor:pointer;transition:all 0.2s">
+        <span style="font-size:16px">🔄</span> Not happy with it? Record again
+      </button>
   </div>
 
   <div style="font-size:11px;color:var(--muted2);text-align:center;margin-top:4px;line-height:1.6">
@@ -567,12 +568,16 @@ function toggleQuestion(i){
   const count = Object.keys(selectedQuestions).length;
 
   if(isSelected){
+    // deselect — save the answer but mark as unselected
+    // keep the answer in selectedQuestions as a draft so it's restored on reselect
     item.classList.remove('selected');
     delete selectedQuestions[i];
   } else {
     if(count >= 3){ showError('Pick 3 questions max. Deselect one first.'); return; }
     item.classList.add('selected');
-    selectedQuestions[i] = document.getElementById('qa'+i).value;
+    // restore previously typed answer if it exists
+    const existing = document.getElementById('qa'+i).value;
+    selectedQuestions[i] = existing;
     setTimeout(()=>document.getElementById('qa'+i).focus(), 100);
   }
   hideError();
@@ -774,6 +779,10 @@ function updateProgress(step){
   document.getElementById('nextLabel').textContent = step === TOTAL_STEPS-1 ? 'Submit Profile 🎉' : 'Continue →';
 }
 
+function goBack(){
+  if(currentStep > 0) goToStep(currentStep - 1);
+}
+
 function goToStep(step){
   document.getElementById('page'+currentStep).classList.remove('active');
   currentStep = step;
@@ -781,6 +790,8 @@ function goToStep(step){
   updateProgress(step);
   hideError();
   window.scrollTo(0,0);
+  // show back button on all steps except first
+  document.getElementById('backBtn').style.display = step > 0 ? 'block' : 'none';
 }
 
 // ── VALIDATION PER STEP
