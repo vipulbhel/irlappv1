@@ -331,8 +331,8 @@ input[type="file"]{display:none}
   <p class="page-sub">Quick stuff first. Takes less than a minute.</p>
 
   <div class="field">
-    <label class="field-label">Your name</label>
-    <input type="text" id="nameInput" placeholder="Your name" maxlength="40"/>
+    <label class="field-label">Your name <span style="color:var(--muted2);font-size:10px;letter-spacing:0;text-transform:none;margin-left:4px">· from LinkedIn</span></label>
+    <input type="text" id="nameInput" placeholder="Your name" maxlength="40" readonly style="opacity:0.6;cursor:not-allowed;border-color:rgba(245,237,232,0.06);background:rgba(245,237,232,0.02)"/>
   </div>
 
   <div class="field">
@@ -870,9 +870,9 @@ async function submitProfile(){
       if(!photoFiles[i]) continue;
       const ext   = photoFiles[i].name.split('.').pop();
       const path  = `${phone}/photo${i+1}_${Date.now()}.${ext}`;
-      const { error: upErr } = await db.storage.from('photos').upload(path, photoFiles[i], { upsert: true });
+      const { error: upErr } = await db.storage.from('Photos').upload(path, photoFiles[i], { upsert: true });
       if(upErr) throw new Error('Photo upload error: ' + upErr.message);
-      const { data } = db.storage.from('photos').getPublicUrl(path);
+      const { data } = db.storage.from('Photos').getPublicUrl(path);
       photoUrls[i] = data.publicUrl;
     }
 
@@ -880,20 +880,21 @@ async function submitProfile(){
     let voiceUrl = null;
     if(audioBlob){
       const voicePath = `${phone}/voice_${Date.now()}.webm`;
-      const { error: vErr } = await db.storage.from('voice').upload(voicePath, audioBlob, { upsert: true });
+      const { error: vErr } = await db.storage.from('Voice').upload(voicePath, audioBlob, { upsert: true });
       if(vErr) throw new Error('Voice upload error: ' + vErr.message);
-      const { data: vData } = db.storage.from('voice').getPublicUrl(voicePath);
+      const { data: vData } = db.storage.from('Voice').getPublicUrl(voicePath);
       voiceUrl = vData.publicUrl;
     }
 
     // 4 — save to user_media
-    const { error: mediaErr } = await db.from('user_media').upsert({
+    await db.from('user_media').delete().eq('user_id', userId);
+    const { error: mediaErr } = await db.from('user_media').insert({
       user_id:   userId,
       photo_1:   photoUrls[0],
       photo_2:   photoUrls[1],
       photo_3:   photoUrls[2],
       voice_url: voiceUrl,
-    }, { onConflict: 'user_id' });
+    });
     if(mediaErr) throw new Error('Media error: ' + mediaErr.message);
 
     // 5 — save answers
