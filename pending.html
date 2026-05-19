@@ -51,9 +51,6 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
 .whatsapp-note p{font-size:12px;color:var(--muted);line-height:1.5}
 .whatsapp-note p b{color:var(--cream)}
 
-/* check status button */
-.btn-check{width:100%;background:transparent;border:1px solid rgba(232,67,122,0.3);border-radius:13px;padding:16px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--rose2);cursor:pointer;transition:all 0.2s;margin-bottom:10px}
-.btn-check:hover{background:rgba(232,67,122,0.08);border-color:rgba(232,67,122,0.5)}
 
 .footer-note{font-size:11px;color:var(--muted2);line-height:1.6}
 .footer-note a{color:var(--rose2);text-decoration:none}
@@ -113,74 +110,39 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
 </div>
 
 <script>
-const SUPABASE_URL = 'https://sxpbdkamagunvktdkogw.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4cGJka2FtYWd1bnZrdGRrb2d3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwMDc3NDUsImV4cCI6MjA5NDU4Mzc0NX0.rTQeSH2dWSLP0IxwewvvEn3qxIbRQcCMZVjpr_0_LJ8';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const { createClient } = window.supabase;
+const db = createClient(
+  'https://sxpbdkamagunvktdkogw.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4cGJka2FtYWd1bnZrdGRrb2d3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwMDc3NDUsImV4cCI6MjA5NDU4Mzc0NX0.rTQeSH2dWSLP0IxwewvvEn3qxIbRQcCMZVjpr_0_LJ8'
+);
 
 const phone = localStorage.getItem('irl_phone');
-if (!phone) window.location.href = 'index.html';
+if(!phone) window.location.href = 'index.html';
 
-// get position on load
 window.addEventListener('load', async () => {
-  await loadPosition();
-});
-
-async function loadPosition() {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('profiles')
-      .select('id, status, onboarding_step')
+      .select('id, status')
       .eq('phone', phone)
-      .single();
+      .limit(1);
 
-    if (error) throw error;
+    if(error || !data || data.length === 0) return;
 
-    if (data.status === 'approved') {
+    const user = data[0];
+
+    if(user.status === 'approved'){
       window.location.href = 'home.html';
       return;
     }
 
-    // show their row position as queue number
-    document.getElementById('positionNum').textContent = '#' + data.id;
+    // show position number
+    document.getElementById('positionNum').textContent = '#' + user.id;
 
-  } catch(err) {
+  } catch(err){
     console.error(err);
-    document.getElementById('positionNum').textContent = '#—';
   }
-}
-
-async function checkStatus() {
-  const btn = document.querySelector('.btn-check');
-  btn.textContent = 'Checking...';
-  btn.disabled = true;
-
-  try {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('status')
-      .eq('phone', phone)
-      .single();
-
-    if (error) throw error;
-
-    if (data.status === 'approved') {
-      window.location.href = 'home.html';
-    } else if (data.status === 'rejected') {
-      btn.textContent = 'Not approved';
-      btn.style.color = '#ff6b6b';
-      btn.style.borderColor = 'rgba(255,107,107,0.3)';
-    } else {
-      btn.textContent = 'Still reviewing — check back soon';
-      setTimeout(() => {
-        btn.textContent = 'Check my status';
-        btn.disabled = false;
-      }, 3000);
-    }
-  } catch(err) {
-    btn.textContent = 'Check my status';
-    btn.disabled = false;
-  }
-}
+});
 </script>
 </body>
 </html>
