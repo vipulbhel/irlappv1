@@ -337,7 +337,7 @@ input[type="file"]{display:none}
 
   <div class="field">
     <label class="field-label">Age</label>
-    <input type="number" id="ageInput" placeholder="Your age" min="18" max="45"/>
+<input type="tel" id="ageInput" placeholder="Your age" maxlength="2" inputmode="numeric"/>
   </div>
 
   <div class="field">
@@ -553,12 +553,21 @@ function buildQuestions(){
     `;
     div.addEventListener('click', () => toggleQuestion(i));
     const ta = div.querySelector('textarea');
-    ta.addEventListener('input', () => {
+ta.addEventListener('input', () => {
+  // auto select the card when user starts typing
+  const item = document.getElementById('qi'+i);
+  const count = Object.keys(selectedQuestions).length;
+  if(!item.classList.contains('selected') && ta.value.trim()){
+    if(count < 3){
+      item.classList.add('selected');
       selectedQuestions[i] = ta.value;
-      document.getElementById('qc'+i).textContent = ta.value.length + ' / 150';
-    });
-    pool.appendChild(div);
-  });
+      updateQCounter();
+      updateLockedState();
+    }
+  }
+  selectedQuestions[i] = ta.value;
+  document.getElementById('qc'+i).textContent = ta.value.length + ' / 150';
+});
 }
 buildQuestions();
 
@@ -878,14 +887,16 @@ async function submitProfile(){
     }
 
     // 4 — save to user_media
-    const { error: mediaErr } = await db.from('user_media').upsert({
-      user_id:   userId,
-      photo_1:   photoUrls[0],
-      photo_2:   photoUrls[1],
-      photo_3:   photoUrls[2],
-      voice_url: voiceUrl,
-    }, { onConflict: 'user_id' });
-    if(mediaErr) throw new Error('Media error: ' + mediaErr.message);
+// delete existing row first then insert fresh
+await db.from('user_media').delete().eq('user_id', userId);
+const { error: mediaErr } = await db.from('user_media').insert({
+  user_id:   userId,
+  photo_1:   photoUrls[0],
+  photo_2:   photoUrls[1],
+  photo_3:   photoUrls[2],
+  voice_url: voiceUrl,
+});
+if(mediaErr) throw new Error('Media error: ' + mediaErr.message);
 
     // 5 — save answers
     const answerRows = Object.keys(selectedQuestions).map(k => ({
