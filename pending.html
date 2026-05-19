@@ -102,6 +102,18 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
     <p>We'll send you a <b>WhatsApp message</b> on your registered number the moment your profile is approved.</p>
   </div>
 
+<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+
+    <button onclick="shareApp()" style="width:100%;background:linear-gradient(135deg,#E8437A,#C4306A);border:none;border-radius:13px;padding:16px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+      🔗 Invite a friend
+    </button>
+
+    <a href="https://instagram.com/getirl.in" target="_blank" style="width:100%;background:rgba(245,237,232,0.04);border:1px solid rgba(245,237,232,0.12);border-radius:13px;padding:16px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--cream);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none">
+      📸 Follow us on Instagram
+    </a>
+
+  </div>
+
   <p class="footer-note">
     Questions? Reach us at <a href="mailto:hello@getirl.in">hello@getirl.in</a>
   </p>
@@ -141,6 +153,17 @@ window.addEventListener('load', async () => {
     console.error(err);
   }
 });
+
+  function shareApp(){
+  const text = "I just joined IRL — India's new dating experience. Verified profiles, real events, actually different. Get early access 👇";
+  const url = 'https://irlappv1.vercel.app';
+  if(navigator.share){
+    navigator.share({ title: 'IRL', text: text, url: url });
+  } else {
+    navigator.clipboard.writeText(text + '\n' + url);
+    alert('Link copied! Share it with a friend.');
+  }
+}
 </script>
 </body>
 </html>
