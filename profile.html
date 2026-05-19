@@ -861,9 +861,9 @@ async function submitProfile(){
       if(!photoFiles[i]) continue;
       const ext   = photoFiles[i].name.split('.').pop();
       const path  = `${phone}/photo${i+1}_${Date.now()}.${ext}`;
-      const { error: upErr } = await db.storage.from('photos').upload(path, photoFiles[i], { upsert: true });
+      const { error: upErr } = await db.storage.from('Photos').upload(path, photoFiles[i], { upsert: true });
       if(upErr) throw new Error('Photo upload error: ' + upErr.message);
-      const { data } = db.storage.from('photos').getPublicUrl(path);
+      const { data } = db.storage.from('Photos').getPublicUrl(path);
       photoUrls[i] = data.publicUrl;
     }
 
@@ -871,9 +871,9 @@ async function submitProfile(){
     let voiceUrl = null;
     if(audioBlob){
       const voicePath = `${phone}/voice_${Date.now()}.webm`;
-      const { error: vErr } = await db.storage.from('voice').upload(voicePath, audioBlob, { upsert: true });
+      const { error: vErr } = await db.storage.from('Voice').upload(voicePath, audioBlob, { upsert: true });
       if(vErr) throw new Error('Voice upload error: ' + vErr.message);
-      const { data: vData } = db.storage.from('voice').getPublicUrl(voicePath);
+      const { data: vData } = db.storage.from('Voice').getPublicUrl(voicePath);
       voiceUrl = vData.publicUrl;
     }
 
