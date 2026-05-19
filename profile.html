@@ -337,7 +337,7 @@ input[type="file"]{display:none}
 
   <div class="field">
     <label class="field-label">Age</label>
-<input type="tel" id="ageInput" placeholder="Your age" maxlength="2" inputmode="numeric"/>
+<input type="tel" id="ageInput" placeholder="Your age" maxlength="2" inputmode="numeric" style="-webkit-appearance:none;appearance:none;"/>
   </div>
 
   <div class="field">
@@ -511,8 +511,14 @@ const userId = localStorage.getItem('irl_li_uid');
 if(!phone){ window.location.href = 'index.html'; }
 
 // prefill name from LinkedIn
-const liName = localStorage.getItem('irl_li_name');
-if(liName) document.getElementById('nameInput').value = liName;
+window.addEventListener('load', () => {
+  const liName = localStorage.getItem('irl_li_name');
+  if(liName){
+    const nameEl = document.getElementById('nameInput');
+    nameEl.value = liName;
+    nameEl.setAttribute('placeholder', liName);
+  }
+});
 
 // ── STATE
 let currentStep = 0;
