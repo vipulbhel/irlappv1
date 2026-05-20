@@ -807,16 +807,34 @@ async function saveBasic(){
     const age = parseInt(document.getElementById('edit-age').value);
     const city = document.getElementById('edit-city').value;
     const intent = document.getElementById('edit-intent').value;
-    const currentGender = profileData.gender;
-const genderChanged = editGender !== currentGender;
-const updateData = { age, gender:editGender, city, intent };
-if(genderChanged) updateData.onboarding_step = 1; // triggers re-review
-const { error } = await db.from('profiles').update(updateData).eq('phone', phone);
+
+    const genderChanged = editGender !== profileData.gender;
+
+    const updateData = { age, gender: editGender, city, intent };
+
+    // if gender changed — send back to review
+    if(genderChanged){
+      updateData.status = 'pending';
+      updateData.onboarding_step = 1;
+    }
+
+    const { error } = await db.from('profiles').update(updateData).eq('phone', phone);
     if(error) throw error;
-    profileData.age = age; profileData.gender = editGender; profileData.city = city; profileData.intent = intent;
+
+    if(genderChanged){
+      // redirect to pending — profile needs re-review
+      window.location.href = 'pending.html';
+      return;
+    }
+
+    profileData.age = age;
+    profileData.gender = editGender;
+    profileData.city = city;
+    profileData.intent = intent;
     renderProfile();
     closeModal('basic');
     showToast('Profile updated ✓');
+
   } catch(err){
     console.error(err);
     showToast('Error saving. Try again.');
