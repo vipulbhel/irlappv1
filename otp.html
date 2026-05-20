@@ -328,12 +328,13 @@ async function verifyOTP(){
 }
 
 function redirectByStep(user){
-  if(user.status==='approved'){ window.location.href='home.html'; return; }
-  if(user.status==='pending' && user.onboarding_step>=2){ window.location.href='pending.html'; return; }
+  if(user.status === 'approved'){ window.location.href = 'home.html'; return; }
+  if(user.review_reason === 'gender_change'){ window.location.href = 'pending.html'; return; }
+  if(user.status === 'pending' && user.onboarding_step >= 2){ window.location.href = 'pending.html'; return; }
   switch(user.onboarding_step){
-    case 0: window.location.href='linkedin.html'; break;
-    case 1: window.location.href='profile.html'; break;
-    default: window.location.href='linkedin.html';
+    case 0: window.location.href = 'linkedin.html'; break;
+    case 1: window.location.href = 'profile.html'; break;
+    default: window.location.href = 'linkedin.html';
   }
 }
 
