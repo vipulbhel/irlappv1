@@ -64,7 +64,7 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
 }
 .nav-item.active{color:var(--rose)}
 .nav-icon{font-size:22px;line-height:1}
-.nav-label{font-size:10px;font-weight:500;letter-spacing:0.5px;text-transform:uppercase}
+.nav-label{font-size:10px;font-weight:500;letter-spacing:0.3px}
 
 /* ── PROFILE TAB ── */
 .profile-wrap{padding:16px}
@@ -463,20 +463,28 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
   <button class="nav-item active" id="nav-match" onclick="switchTab('match')">
-    <span class="nav-icon">✨</span>
+    <span class="nav-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    </span>
     <span class="nav-label">Match</span>
   </button>
   <button class="nav-item" id="nav-chat" onclick="switchTab('chat')">
-    <span class="nav-icon">💬</span>
+    <span class="nav-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    </span>
     <span class="nav-label">Chat</span>
   </button>
   <button class="nav-item" id="nav-events" onclick="switchTab('events')">
-    <span class="nav-icon">🎉</span>
+    <span class="nav-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    </span>
     <span class="nav-label">Events</span>
   </button>
   <button class="nav-item" id="nav-profile" onclick="switchTab('profile')">
-    <span class="nav-icon">👤</span>
-    <span class="nav-label">Profile</span>
+    <span class="nav-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    </span>
+    <span class="nav-label">Events</span>
   </button>
 </nav>
 
@@ -855,7 +863,10 @@ async function savePhotos(){
       }
     }
     await db.from('user_media').update({ photo_1:finalUrls[0], photo_2:finalUrls[1], photo_3:finalUrls[2] }).eq('user_id', profileData.user_id);
-    photoUrls = finalUrls;
+photoUrls = finalUrls;
+    mediaData.photo_1 = finalUrls[0];
+    mediaData.photo_2 = finalUrls[1];
+    mediaData.photo_3 = finalUrls[2];
     currentPhotoIdx = 0;
     renderPhotos();
     closeModal('photos');
