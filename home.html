@@ -1419,25 +1419,27 @@ function handleFPLike(){
 }
 
 // load matches when match tab is first opened
+
+
+// load matches when match tab opened
 let matchLoaded = false;
+
+function tryLoadMatches(){
+  if(matchLoaded) return;
+  if(!phone) return;
+  matchLoaded = true;
+  loadMatches();
+}
+
+// override switchTab to trigger match load
 const origSwitchTab = switchTab;
 switchTab = function(tab){
   origSwitchTab(tab);
-  if(tab === 'match' && !matchLoaded && profileData.user_id){
-    matchLoaded = true;
-    loadMatches();
-  }
+  if(tab === 'match') tryLoadMatches();
 };
 
-// also load if starting on match tab and profile data already loaded
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    if(profileData.user_id && !matchLoaded){
-      matchLoaded = true;
-      loadMatches();
-    }
-  }, 2000);
-});
+// auto trigger on page load after short delay
+setTimeout(tryLoadMatches, 1500);
 </script>
 </body>
 </html>
