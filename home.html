@@ -813,10 +813,11 @@ async function saveBasic(){
     const updateData = { age, gender: editGender, city, intent };
 
     // if gender changed — send back to review
-    if(genderChanged){
-      updateData.status = 'pending';
-      updateData.onboarding_step = 1;
-    }
+  if(genderChanged){
+  updateData.status = 'pending';
+  updateData.onboarding_step = 1;
+  updateData.review_reason = 'gender_change';
+}
 
     const { error } = await db.from('profiles').update(updateData).eq('phone', phone);
     if(error) throw error;
