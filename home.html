@@ -807,7 +807,11 @@ async function saveBasic(){
     const age = parseInt(document.getElementById('edit-age').value);
     const city = document.getElementById('edit-city').value;
     const intent = document.getElementById('edit-intent').value;
-    const { error } = await db.from('profiles').update({ age, gender:editGender, city, intent }).eq('phone', phone);
+    const currentGender = profileData.gender;
+const genderChanged = editGender !== currentGender;
+const updateData = { age, gender:editGender, city, intent };
+if(genderChanged) updateData.onboarding_step = 1; // triggers re-review
+const { error } = await db.from('profiles').update(updateData).eq('phone', phone);
     if(error) throw error;
     profileData.age = age; profileData.gender = editGender; profileData.city = city; profileData.intent = intent;
     renderProfile();
