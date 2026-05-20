@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IRL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0D0810;--card:#160F1A;--rose:#E8437A;--rose2:#FF6B9D;
+  --cream:#F5EDE8;--muted:#8A7A82;--muted2:#3A3040;
+  --border:rgba(245,237,232,0.08);--green:#34D399;
+}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;min-height:100svh;position:relative}
+
+/* ── AMBIENT ── */
+.amb1{position:fixed;top:-100px;right:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(232,67,122,0.07) 0%,transparent 65%);pointer-events:none;z-index:0}
+.amb2{position:fixed;bottom:60px;left:-80px;width:300px;height:300px;background:radial-gradient(circle,rgba(120,40,90,0.05) 0%,transparent 65%);pointer-events:none;z-index:0}
+
+/* ── TOP BAR ── */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:16px 24px;
+  background:rgba(13,8,16,0.92);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+}
+.logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-1px}
+.logo span{color:var(--rose)}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.notif-btn{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px}
+
+/* ── TAB CONTENT ── */
+.tab-content{
+  position:fixed;top:64px;left:0;right:0;bottom:64px;
+  overflow-y:auto;z-index:1;
+  -webkit-overflow-scrolling:touch;
+}
+.tab-pane{display:none;min-height:100%;padding-bottom:24px}
+.tab-pane.active{display:block;animation:fadeup 0.3s ease forwards}
+@keyframes fadeup{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:100;
+  display:flex;
+  background:rgba(13,8,16,0.95);
+  backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.nav-item{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:10px 0;cursor:pointer;
+  transition:color 0.2s;
+  border:none;background:none;color:var(--muted2);
+  gap:4px;
+}
+.nav-item.active{color:var(--rose)}
+.nav-icon{font-size:22px;line-height:1}
+.nav-label{font-size:10px;font-weight:500;letter-spacing:0.5px;text-transform:uppercase}
+
+/* ── PROFILE TAB ── */
+.profile-wrap{padding:16px}
+
+/* pending banner */
+.pending-banner{
+  background:rgba(232,67,122,0.08);
+  border:1px solid rgba(232,67,122,0.2);
+  border-radius:14px;padding:14px 16px;
+  margin-bottom:16px;
+  display:flex;align-items:center;gap:10px;
+  font-size:13px;color:var(--rose2);line-height:1.5;
+}
+
+/* profile header */
+.profile-header{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:20px;overflow:hidden;margin-bottom:12px;
+  position:relative;
+}
+.photo-carousel{position:relative;aspect-ratio:3/4;overflow:hidden}
+.photo-carousel img{width:100%;height:100%;object-fit:cover}
+.photo-placeholder{width:100%;height:100%;background:rgba(245,237,232,0.04);display:flex;align-items:center;justify-content:center;font-size:48px}
+.photo-counter{position:absolute;top:12px;right:12px;background:rgba(13,8,16,0.7);backdrop-filter:blur(8px);border-radius:100px;padding:4px 10px;font-size:11px;color:var(--cream)}
+.photo-dots{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:4px}
+.photo-dot{width:5px;height:5px;border-radius:50%;background:rgba(245,237,232,0.4)}
+.photo-dot.active{background:white}
+.photo-nav-left,.photo-nav-right{position:absolute;top:50%;transform:translateY(-50%);background:rgba(13,8,16,0.5);border:none;color:white;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
+.photo-nav-left{left:8px}
+.photo-nav-right{right:8px}
+
+.edit-photo-btn{
+  position:absolute;bottom:12px;right:12px;
+  background:rgba(13,8,16,0.8);backdrop-filter:blur(8px);
+  border:1px solid rgba(245,237,232,0.2);
+  border-radius:100px;padding:6px 14px;
+  font-size:11px;color:var(--cream);cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-weight:500;
+}
+
+.profile-info{padding:20px}
+.profile-name-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.profile-name{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;letter-spacing:-0.5px}
+.profile-meta{font-size:13px;color:var(--muted);margin-bottom:12px}
+.intent-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(232,67,122,0.08);border:1px solid rgba(232,67,122,0.2);
+  border-radius:100px;padding:5px 12px;
+  font-size:11px;color:var(--rose2);font-weight:500;
+  letter-spacing:0.3px;
+}
+
+/* edit btn inline */
+.inline-edit-btn{
+  background:none;border:1px solid var(--border);
+  border-radius:100px;padding:5px 12px;
+  font-size:11px;color:var(--muted);cursor:pointer;
+  font-family:'DM Sans',sans-serif;
+  transition:all 0.2s;
+}
+.inline-edit-btn:hover{border-color:rgba(232,67,122,0.3);color:var(--rose2)}
+
+/* section cards */
+.section-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:20px;padding:20px;margin-bottom:12px;
+}
+.section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.section-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;letter-spacing:-0.2px}
+
+/* voice note */
+.voice-player{
+  display:flex;align-items:center;gap:14px;
+  background:rgba(245,237,232,0.03);
+  border:1px solid var(--border);border-radius:14px;padding:14px 16px;
+}
+.play-btn{
+  width:44px;height:44px;border-radius:50%;
+  background:var(--rose);border:none;color:white;
+  font-size:16px;cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform 0.15s;
+}
+.play-btn:hover{transform:scale(1.05)}
+.voice-progress-wrap{flex:1}
+.voice-progress-bar{height:3px;background:rgba(245,237,232,0.1);border-radius:2px;overflow:hidden;margin-bottom:4px}
+.voice-progress-fill{height:100%;width:0%;background:var(--rose);border-radius:2px;transition:width 0.1s}
+.voice-time{font-size:10px;color:var(--muted)}
+
+/* questions */
+.q-item-view{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.q-item-view:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
+.q-question{font-size:12px;color:var(--muted);margin-bottom:6px;line-height:1.4}
+.q-answer{font-size:14px;color:var(--cream);line-height:1.6}
+
+/* edit modal */
+.modal-overlay{
+  display:none;position:fixed;inset:0;z-index:999;
+  background:rgba(13,8,16,0.9);backdrop-filter:blur(8px);
+  align-items:flex-end;justify-content:center;
+}
+.modal-overlay.show{display:flex;animation:fadeup 0.3s ease forwards}
+.modal{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:24px 24px 0 0;padding:28px 24px 40px;
+  width:100%;max-width:500px;max-height:85vh;overflow-y:auto;
+}
+.modal-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;letter-spacing:-0.3px;margin-bottom:20px}
+.modal-close{position:absolute;top:16px;right:20px;background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer}
+.modal input,.modal textarea,.modal select{
+  background:rgba(245,237,232,0.04);border:1px solid rgba(245,237,232,0.1);
+  border-radius:13px;padding:14px 16px;
+  font-family:'DM Sans',sans-serif;font-size:14px;color:var(--cream);
+  outline:none;width:100%;-webkit-appearance:none;
+  transition:border-color 0.2s;margin-bottom:12px;
+}
+.modal input:focus,.modal textarea:focus,.modal select:focus{border-color:rgba(232,67,122,0.5)}
+.modal textarea{resize:none;min-height:80px;line-height:1.5}
+.modal-label{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;display:block}
+.modal select option{background:#160F1A}
+.btn-save{
+  width:100%;background:linear-gradient(135deg,#E8437A,#C4306A);
+  border:none;border-radius:13px;padding:16px;
+  font-family:'Syne',sans-serif;font-size:15px;font-weight:700;
+  color:white;cursor:pointer;margin-top:4px;
+  transition:opacity 0.2s;
+}
+.btn-save:hover{opacity:0.9}
+.btn-save:disabled{opacity:0.5;cursor:not-allowed}
+
+/* gender pills in modal */
+.modal-gender-row{display:flex;gap:10px;margin-bottom:12px}
+.modal-gpill{flex:1;padding:12px;border:1.5px solid rgba(245,237,232,0.1);border-radius:11px;text-align:center;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;transition:all 0.2s}
+.modal-gpill.sel{border-color:var(--rose);background:rgba(232,67,122,0.1);color:var(--cream)}
+
+/* logout */
+.logout-btn{
+  width:100%;background:transparent;
+  border:1px solid rgba(245,237,232,0.1);
+  border-radius:13px;padding:16px;
+  font-family:'Syne',sans-serif;font-size:14px;font-weight:700;
+  color:var(--muted);cursor:pointer;margin-top:4px;
+  transition:all 0.2s;
+}
+.logout-btn:hover{border-color:rgba(232,67,122,0.3);color:var(--rose2)}
+
+/* ── EVENTS TAB ── */
+.events-wrap{
+  min-height:100%;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:40px 24px;text-align:center;
+  position:relative;overflow:hidden;
+}
+.events-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:300px;height:300px;background:radial-gradient(circle,rgba(232,67,122,0.1) 0%,transparent 70%);pointer-events:none}
+.events-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(232,67,122,0.08);border:1px solid rgba(232,67,122,0.2);
+  border-radius:100px;padding:8px 18px;
+  font-size:11px;color:var(--rose2);
+  letter-spacing:2px;text-transform:uppercase;font-weight:600;
+  margin-bottom:32px;position:relative;
+}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:var(--rose);animation:pulse 1.8s infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(232,67,122,0.5)}60%{opacity:0.6;box-shadow:0 0 0 6px rgba(232,67,122,0)}}
+
+.events-title{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(40px,12vw,72px);
+  font-weight:800;letter-spacing:-3px;
+  line-height:0.95;margin-bottom:20px;
+  position:relative;
+}
+.events-title em{font-style:italic;color:var(--rose);display:block;font-weight:400}
+.events-title .hollow{-webkit-text-stroke:1.5px rgba(245,237,232,0.2);color:transparent}
+
+.events-sub{
+  font-size:14px;color:var(--muted);
+  line-height:1.7;max-width:300px;
+  margin-bottom:36px;font-weight:300;position:relative;
+}
+.events-sub b{color:var(--cream)}
+
+/* how to get selected */
+.selection-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:20px;padding:24px;
+  width:100%;max-width:340px;
+  text-align:left;position:relative;
+}
+.selection-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:16px}
+.selection-item{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.selection-item:last-child{margin-bottom:0}
+.sel-icon{width:32px;height:32px;border-radius:10px;background:rgba(232,67,122,0.1);border:1px solid rgba(232,67,122,0.2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.sel-text{font-size:13px;color:var(--muted);line-height:1.4}
+.sel-text b{color:var(--cream)}
+
+/* ── MATCH & CHAT PLACEHOLDERS ── */
+.placeholder-wrap{
+  min-height:100%;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:40px 24px;text-align:center;
+}
+.placeholder-emoji{font-size:48px;margin-bottom:16px}
+.placeholder-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-0.5px;margin-bottom:8px}
+.placeholder-sub{font-size:13px;color:var(--muted);line-height:1.6;max-width:260px}
+
+/* ── INLINE EDIT INPUTS ── */
+.editable-field{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 0;border-bottom:1px solid var(--border);
+}
+.editable-field:last-child{border-bottom:none}
+.ef-label{font-size:11px;color:var(--muted);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:2px}
+.ef-value{font-size:14px;color:var(--cream)}
+.ef-edit{background:none;border:none;color:var(--rose2);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;padding:4px 8px;flex-shrink:0}
+
+/* loading */
+.loading-state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;gap:12px}
+.dots-loader{display:flex;gap:5px;align-items:center}
+.dots-loader span{width:7px;height:7px;border-radius:50%;background:var(--rose);animation:dotbounce 1.2s infinite ease-in-out}
+.dots-loader span:nth-child(1){animation-delay:0s}
+.dots-loader span:nth-child(2){animation-delay:0.2s}
+.dots-loader span:nth-child(3){animation-delay:0.4s}
+@keyframes dotbounce{0%,80%,100%{transform:scale(0.7);opacity:0.5}40%{transform:scale(1.1);opacity:1}}
+
+/* toast */
+.toast{
+  position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+  background:var(--green);color:#080808;
+  padding:10px 24px;border-radius:100px;
+  font-family:'Syne',sans-serif;font-size:13px;font-weight:700;
+  z-index:999;display:none;
+  animation:fadeup 0.3s ease forwards;
+}
+.toast.show{display:block}
+
+/* photo upload grid in modal */
+.modal-photo-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.modal-photo-slot{aspect-ratio:3/4;border:1.5px dashed rgba(245,237,232,0.15);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:rgba(245,237,232,0.02);position:relative;overflow:hidden;transition:all 0.2s}
+.modal-photo-slot.filled{border-style:solid;border-color:rgba(232,67,122,0.3)}
+.modal-photo-slot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.modal-photo-slot .rem{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:rgba(13,8,16,0.8);border:none;color:white;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2}
+.slot-plus{font-size:20px;color:var(--muted2)}
+.slot-main{font-size:9px;color:var(--muted2);margin-top:3px}
+
+@keyframes fadeup{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<div class="amb1"></div>
+<div class="amb2"></div>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="logo">ir<span>l</span></div>
+  <div class="topbar-right">
+    <button class="notif-btn">🔔</button>
+  </div>
+</div>
+
+<!-- TAB CONTENT -->
+<div class="tab-content">
+
+  <!-- ══ MATCH TAB ══ -->
+  <div class="tab-pane active" id="tab-match">
+    <div class="placeholder-wrap">
+      <div class="placeholder-emoji">💫</div>
+      <h2 class="placeholder-title">Matching coming soon.</h2>
+      <p class="placeholder-sub">We're onboarding verified members. Your matches will appear here once we have people in your city.</p>
+    </div>
+  </div>
+
+  <!-- ══ CHAT TAB ══ -->
+  <div class="tab-pane" id="tab-chat">
+    <div class="placeholder-wrap">
+      <div class="placeholder-emoji">💬</div>
+      <h2 class="placeholder-title">No matches yet.</h2>
+      <p class="placeholder-sub">When you match with someone your conversations will show up here.</p>
+    </div>
+  </div>
+
+  <!-- ══ EVENTS TAB ══ -->
+  <div class="tab-pane" id="tab-events">
+    <div class="events-wrap">
+      <div class="events-glow"></div>
+
+      <div class="events-badge">
+        <div class="badge-dot"></div>
+        Coming soon
+      </div>
+
+      <h1 class="events-title">
+        Something
+        <em>real</em>
+        <span class="hollow">is coming.</span>
+      </h1>
+
+      <p class="events-sub">
+        The first exclusive IRL event is being planned.<br>
+        <b>Not everyone gets in.</b>
+      </p>
+
+      <div class="selection-card">
+        <div class="selection-title">How to get selected</div>
+        <div class="selection-item">
+          <div class="sel-icon">✓</div>
+          <div class="sel-text"><b>Complete your profile.</b> Photos, voice note, all of it.</div>
+        </div>
+        <div class="selection-item">
+          <div class="sel-icon">💬</div>
+          <div class="sel-text"><b>Stay active.</b> The more you engage, the higher your chances.</div>
+        </div>
+        <div class="selection-item">
+          <div class="sel-icon">🎯</div>
+          <div class="sel-text"><b>Match and connect.</b> Real conversations get noticed.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PROFILE TAB ══ -->
+  <div class="tab-pane" id="tab-profile">
+    <div class="profile-wrap">
+
+      <!-- pending banner -->
+      <div class="pending-banner" id="pendingBanner" style="display:none">
+        ⏳ Your profile is under review. We'll notify you on WhatsApp once approved.
+      </div>
+
+      <!-- loading -->
+      <div class="loading-state" id="profileLoading">
+        <div class="dots-loader"><span></span><span></span><span></span></div>
+      </div>
+
+      <!-- profile content (hidden until loaded) -->
+      <div id="profileContent" style="display:none">
+
+        <!-- photos + name -->
+        <div class="profile-header">
+          <div class="photo-carousel" id="photoCarousel">
+            <div class="photo-placeholder" id="photoPlaceholder">🙈</div>
+            <img id="mainPhoto" src="" alt="" style="display:none"/>
+            <button class="photo-nav-left" onclick="prevPhoto()">‹</button>
+            <button class="photo-nav-right" onclick="nextPhoto()">›</button>
+            <div class="photo-counter" id="photoCounter" style="display:none">1/1</div>
+            <div class="photo-dots" id="photoDots"></div>
+            <button class="edit-photo-btn" onclick="openModal('photos')">Edit photos</button>
+          </div>
+          <div class="profile-info">
+            <div class="profile-name-row">
+              <div class="profile-name" id="displayName">—</div>
+              <button class="inline-edit-btn" onclick="openModal('basic')">Edit</button>
+            </div>
+            <div class="profile-meta" id="displayMeta">— · —</div>
+            <div class="intent-badge" id="displayIntent">—</div>
+          </div>
+        </div>
+
+        <!-- voice note -->
+        <div class="section-card">
+          <div class="section-header">
+            <div class="section-title">🎙️ Voice intro</div>
+            <button class="inline-edit-btn" onclick="openModal('voice')">Re-record</button>
+          </div>
+          <div class="voice-player" id="voicePlayer">
+            <button class="play-btn" id="playBtn" onclick="toggleVoice()">▶</button>
+            <div class="voice-progress-wrap">
+              <div class="voice-progress-bar">
+                <div class="voice-progress-fill" id="voiceProgressFill"></div>
+              </div>
+              <div class="voice-time" id="voiceTime">0:00</div>
+            </div>
+          </div>
+          <div id="noVoice" style="display:none;font-size:13px;color:var(--muted);text-align:center;padding:8px 0">No voice note yet. Add one!</div>
+        </div>
+
+        <!-- questions -->
+        <div class="section-card">
+          <div class="section-header">
+            <div class="section-title">💬 About me</div>
+            <button class="inline-edit-btn" onclick="openModal('questions')">Edit</button>
+          </div>
+          <div id="questionsDisplay"></div>
+        </div>
+
+        <!-- logout -->
+        <button class="logout-btn" onclick="handleLogout()">Log out</button>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-item active" id="nav-match" onclick="switchTab('match')">
+    <span class="nav-icon">✨</span>
+    <span class="nav-label">Match</span>
+  </button>
+  <button class="nav-item" id="nav-chat" onclick="switchTab('chat')">
+    <span class="nav-icon">💬</span>
+    <span class="nav-label">Chat</span>
+  </button>
+  <button class="nav-item" id="nav-events" onclick="switchTab('events')">
+    <span class="nav-icon">🎉</span>
+    <span class="nav-label">Events</span>
+  </button>
+  <button class="nav-item" id="nav-profile" onclick="switchTab('profile')">
+    <span class="nav-icon">👤</span>
+    <span class="nav-label">Profile</span>
+  </button>
+</nav>
+
+<!-- ══ EDIT MODALS ══ -->
+
+<!-- Basic Info Modal -->
+<div class="modal-overlay" id="modal-basic">
+  <div class="modal" style="position:relative">
+    <div class="modal-title">Edit basic info</div>
+    <button class="modal-close" onclick="closeModal('basic')">✕</button>
+    <label class="modal-label">Age</label>
+    <input type="tel" id="edit-age" placeholder="Your age" maxlength="2" inputmode="numeric"/>
+    <label class="modal-label">Gender</label>
+    <div class="modal-gender-row">
+      <div class="modal-gpill" id="edit-gm" onclick="selectEditGender('male')">Man</div>
+      <div class="modal-gpill" id="edit-gf" onclick="selectEditGender('female')">Woman</div>
+    </div>
+    <label class="modal-label">City</label>
+    <select id="edit-city">
+      <option value="">Select city</option>
+      <option>Mumbai</option>
+      <option>Delhi NCR</option>
+      <option>Bengaluru</option>
+      <option>Pune</option>
+    </select>
+    <label class="modal-label">Looking for</label>
+    <select id="edit-intent">
+      <option value="">Select intent</option>
+      <option>Serious</option>
+      <option>Casual</option>
+      <option>Open</option>
+    </select>
+    <button class="btn-save" onclick="saveBasic()">Save changes</button>
+  </div>
+</div>
+
+<!-- Photos Modal -->
+<div class="modal-overlay" id="modal-photos">
+  <div class="modal" style="position:relative">
+    <div class="modal-title">Edit photos</div>
+    <button class="modal-close" onclick="closeModal('photos')">✕</button>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.5">First photo is mandatory. Tap to change or add more.</p>
+    <div class="modal-photo-grid">
+      <div class="modal-photo-slot" id="mslot0" onclick="triggerModalUpload(0)">
+        <img id="mimg0" src="" style="display:none"/>
+        <button class="rem" id="mrem0" style="display:none" onclick="removeModalPhoto(event,0)">✕</button>
+        <span class="slot-plus">📷</span>
+        <span class="slot-main">Main</span>
+      </div>
+      <div class="modal-photo-slot" id="mslot1" onclick="triggerModalUpload(1)">
+        <img id="mimg1" src="" style="display:none"/>
+        <button class="rem" id="mrem1" style="display:none" onclick="removeModalPhoto(event,1)">✕</button>
+        <span class="slot-plus">＋</span>
+      </div>
+      <div class="modal-photo-slot" id="mslot2" onclick="triggerModalUpload(2)">
+        <img id="mimg2" src="" style="display:none"/>
+        <button class="rem" id="mrem2" style="display:none" onclick="removeModalPhoto(event,2)">✕</button>
+        <span class="slot-plus">＋</span>
+      </div>
+    </div>
+    <input type="file" id="mfile0" accept="image/*" onchange="handleModalPhoto(0,this)" style="display:none"/>
+    <input type="file" id="mfile1" accept="image/*" onchange="handleModalPhoto(1,this)" style="display:none"/>
+    <input type="file" id="mfile2" accept="image/*" onchange="handleModalPhoto(2,this)" style="display:none"/>
+    <button class="btn-save" id="savePhotosBtn" onclick="savePhotos()">Save photos</button>
+  </div>
+</div>
+
+<!-- Voice Modal -->
+<div class="modal-overlay" id="modal-voice">
+  <div class="modal" style="position:relative">
+    <div class="modal-title">Re-record voice note</div>
+    <button class="modal-close" onclick="closeModal('voice')">✕</button>
+    <div style="background:rgba(232,67,122,0.08);border:1px solid rgba(232,67,122,0.15);border-radius:12px;padding:12px 14px;margin-bottom:20px;font-size:13px;color:var(--cream);font-style:italic;line-height:1.5">
+      "Tell us something about yourself that isn't on your LinkedIn."
+    </div>
+    <div style="text-align:center;padding:20px 0">
+      <div style="font-family:'Syne',sans-serif;font-size:48px;font-weight:800;letter-spacing:-2px;color:var(--cream);margin-bottom:4px" id="modal-timer">0:30</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:20px" id="modal-rec-status">Tap to start recording</div>
+      <button id="modal-rec-btn" onclick="toggleModalRecording()" style="width:64px;height:64px;border-radius:50%;border:none;background:var(--rose);font-size:26px;cursor:pointer;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 6px 20px rgba(232,67,122,0.4)">🎙️</button>
+    </div>
+    <!-- playback after recording -->
+    <div id="modal-playback" style="display:none;background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.2);border-radius:14px;padding:14px;margin-bottom:12px">
+      <div style="font-size:12px;color:var(--green);margin-bottom:10px">✓ Recorded</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <button id="modal-play-btn" onclick="playModalVoice()" style="width:36px;height:36px;border-radius:50%;background:var(--rose);border:none;color:white;font-size:14px;cursor:pointer">▶</button>
+        <div style="flex:1;height:3px;background:rgba(245,237,232,0.1);border-radius:2px;overflow:hidden">
+          <div id="modal-play-prog" style="height:100%;width:0%;background:var(--rose);border-radius:2px;transition:width 0.1s"></div>
+        </div>
+      </div>
+    </div>
+    <button id="modal-save-voice" class="btn-save" onclick="saveVoice()" style="display:none">Save voice note</button>
+    <button onclick="resetModalRecording()" style="width:100%;background:none;border:1px solid var(--border);border-radius:13px;padding:13px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);cursor:pointer;margin-top:8px" id="modal-redo" style="display:none">Record again</button>
+  </div>
+</div>
+
+<!-- Questions Modal -->
+<div class="modal-overlay" id="modal-questions">
+  <div class="modal" style="position:relative">
+    <div class="modal-title">Edit your answers</div>
+    <button class="modal-close" onclick="closeModal('questions')">✕</button>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:16px">Select 3 questions and answer them.</p>
+    <div id="modal-q-counter" style="font-size:11px;color:var(--muted);margin-bottom:12px;letter-spacing:0.5px">0 of 3 selected</div>
+    <div id="modal-q-pool"></div>
+    <button class="btn-save" onclick="saveQuestions()">Save answers</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── SUPABASE
+const { createClient } = window.supabase;
+const db = createClient(
+  'https://sxpbdkamagunvktdkogw.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4cGJka2FtYWd1bnZrdGRrb2d3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwMDc3NDUsImV4cCI6MjA5NDU4Mzc0NX0.rTQeSH2dWSLP0IxwewvvEn3qxIbRQcCMZVjpr_0_LJ8'
+);
+
+const phone = localStorage.getItem('irl_phone');
+if(!phone){ window.location.href = 'index.html'; }
+
+// ── STATE
+let profileData = {};
+let mediaData = {};
+let answersData = [];
+let currentPhotoIdx = 0;
+let photoUrls = [null, null, null];
+let modalPhotoFiles = [null, null, null];
+let modalPhotoUrls = [null, null, null];
+let voiceAudio = null;
+let voiceInterval = null;
+let modalRecorder = null;
+let modalAudioChunks = [];
+let modalAudioBlob = null;
+let modalIsRecording = false;
+let modalSecs = 30;
+let modalTimer = null;
+let modalPlayer = null;
+let modalPlayerInterval = null;
+let editGender = '';
+
+const QUESTIONS = [
+  "What does your ideal Sunday look like?",
+  "What are you actually looking for right now, honestly?",
+  "One thing people get wrong about you.",
+  "The last thing that made you genuinely laugh.",
+  "What's something you're currently obsessed with?",
+  "Describe yourself in three words — but make them interesting."
+];
+let modalSelectedQ = {};
+
+// ── TAB SWITCHING
+function switchTab(tab){
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  document.getElementById('nav-'+tab).classList.add('active');
+  if(tab === 'profile' && !profileData.id) loadProfile();
+}
+
+// ── LOAD PROFILE
+async function loadProfile(){
+  try {
+    // get profile
+    const { data: prof } = await db.from('profiles').select('*').eq('phone', phone).limit(1);
+    if(!prof || !prof.length) return;
+    profileData = prof[0];
+
+    // show pending banner
+    if(profileData.status === 'pending'){
+      document.getElementById('pendingBanner').style.display = 'flex';
+    }
+
+    // get media
+    const { data: media } = await db.from('user_media').select('*').eq('user_id', profileData.user_id).limit(1);
+    if(media && media.length) mediaData = media[0];
+
+    // get answers
+    const { data: answers } = await db.from('user_answers').select('*').eq('user_id', profileData.user_id);
+    if(answers) answersData = answers;
+
+    // render
+    renderProfile();
+
+    document.getElementById('profileLoading').style.display = 'none';
+    document.getElementById('profileContent').style.display = 'block';
+
+  } catch(err){
+    console.error(err);
+  }
+}
+
+function renderProfile(){
+  // name / meta / intent
+  document.getElementById('displayName').textContent = profileData.full_name || '—';
+  document.getElementById('displayMeta').textContent = (profileData.age || '—') + ' · ' + (profileData.city || '—');
+  document.getElementById('displayIntent').textContent = profileData.intent || '—';
+
+  // photos
+  photoUrls = [mediaData.photo_1 || null, mediaData.photo_2 || null, mediaData.photo_3 || null];
+  renderPhotos();
+
+  // voice
+  if(mediaData.voice_url){
+    document.getElementById('voicePlayer').style.display = 'flex';
+    document.getElementById('noVoice').style.display = 'none';
+    voiceAudio = new Audio(mediaData.voice_url);
+  } else {
+    document.getElementById('voicePlayer').style.display = 'none';
+    document.getElementById('noVoice').style.display = 'block';
+  }
+
+  // questions
+  const qWrap = document.getElementById('questionsDisplay');
+  qWrap.innerHTML = '';
+  if(answersData.length === 0){
+    qWrap.innerHTML = '<p style="font-size:13px;color:var(--muted);text-align:center;padding:8px 0">No answers yet. Add some!</p>';
+  } else {
+    answersData.forEach(a => {
+      qWrap.innerHTML += `
+        <div class="q-item-view">
+          <div class="q-question">${a.question}</div>
+          <div class="q-answer">${a.answer}</div>
+        </div>`;
+    });
+  }
+}
+
+// ── PHOTOS
+function renderPhotos(){
+  const validPhotos = photoUrls.filter(u => u);
+  const img = document.getElementById('mainPhoto');
+  const ph = document.getElementById('photoPlaceholder');
+  const counter = document.getElementById('photoCounter');
+  const dots = document.getElementById('photoDots');
+
+  if(validPhotos.length === 0){
+    img.style.display = 'none';
+    ph.style.display = 'flex';
+    counter.style.display = 'none';
+    dots.innerHTML = '';
+    return;
+  }
+  img.src = validPhotos[currentPhotoIdx] || validPhotos[0];
+  img.style.display = 'block';
+  ph.style.display = 'none';
+  counter.style.display = 'block';
+  counter.textContent = (currentPhotoIdx+1) + '/' + validPhotos.length;
+  dots.innerHTML = validPhotos.map((_,i) => `<div class="photo-dot ${i===currentPhotoIdx?'active':''}"></div>`).join('');
+}
+function nextPhoto(){ const v=photoUrls.filter(u=>u); currentPhotoIdx=(currentPhotoIdx+1)%v.length; renderPhotos(); }
+function prevPhoto(){ const v=photoUrls.filter(u=>u); currentPhotoIdx=(currentPhotoIdx-1+v.length)%v.length; renderPhotos(); }
+
+// ── VOICE PLAYBACK
+function toggleVoice(){
+  if(!voiceAudio) return;
+  const btn = document.getElementById('playBtn');
+  if(!voiceAudio.paused){ voiceAudio.pause(); btn.textContent='▶'; clearInterval(voiceInterval); return; }
+  voiceAudio.play(); btn.textContent='⏸';
+  voiceInterval = setInterval(()=>{
+    const pct = (voiceAudio.currentTime/(voiceAudio.duration||1))*100;
+    document.getElementById('voiceProgressFill').style.width = pct+'%';
+    const s = Math.floor(voiceAudio.currentTime);
+    document.getElementById('voiceTime').textContent = '0:'+String(s).padStart(2,'0');
+    if(voiceAudio.ended){ btn.textContent='▶'; clearInterval(voiceInterval); document.getElementById('voiceProgressFill').style.width='0%'; document.getElementById('voiceTime').textContent='0:00'; }
+  },100);
+}
+
+// ── MODALS
+function openModal(type){
+  if(type === 'basic'){
+    document.getElementById('edit-age').value = profileData.age || '';
+    document.getElementById('edit-city').value = profileData.city || '';
+    document.getElementById('edit-intent').value = profileData.intent || '';
+    editGender = profileData.gender || '';
+    document.getElementById('edit-gm').classList.toggle('sel', editGender==='male');
+    document.getElementById('edit-gf').classList.toggle('sel', editGender==='female');
+  }
+  if(type === 'photos'){
+    modalPhotoUrls = [...photoUrls];
+    modalPhotoFiles = [null, null, null];
+    [0,1,2].forEach(i => {
+      const img = document.getElementById('mimg'+i);
+      const rem = document.getElementById('mrem'+i);
+      const slot = document.getElementById('mslot'+i);
+      if(modalPhotoUrls[i]){
+        img.src = modalPhotoUrls[i]; img.style.display='block';
+        rem.style.display='flex'; slot.classList.add('filled');
+      } else {
+        img.src=''; img.style.display='none';
+        rem.style.display='none'; slot.classList.remove('filled');
+      }
+    });
+  }
+  if(type === 'questions'){
+    buildModalQuestions();
+  }
+  document.getElementById('modal-'+type).classList.add('show');
+}
+
+function closeModal(type){
+  document.getElementById('modal-'+type).classList.remove('show');
+}
+
+// close modal on overlay tap
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', function(e){
+    if(e.target === this) this.classList.remove('show');
+  });
+});
+
+// ── GENDER EDIT
+function selectEditGender(g){
+  editGender = g;
+  document.getElementById('edit-gm').classList.toggle('sel', g==='male');
+  document.getElementById('edit-gf').classList.toggle('sel', g==='female');
+}
+
+// ── SAVE BASIC
+async function saveBasic(){
+  const btn = document.querySelector('#modal-basic .btn-save');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  try {
+    const age = parseInt(document.getElementById('edit-age').value);
+    const city = document.getElementById('edit-city').value;
+    const intent = document.getElementById('edit-intent').value;
+    const { error } = await db.from('profiles').update({ age, gender:editGender, city, intent }).eq('phone', phone);
+    if(error) throw error;
+    profileData.age = age; profileData.gender = editGender; profileData.city = city; profileData.intent = intent;
+    renderProfile();
+    closeModal('basic');
+    showToast('Profile updated ✓');
+  } catch(err){
+    console.error(err);
+    showToast('Error saving. Try again.');
+  }
+  btn.disabled = false; btn.textContent = 'Save changes';
+}
+
+// ── PHOTOS MODAL
+function triggerModalUpload(i){ document.getElementById('mfile'+i).click(); }
+function handleModalPhoto(i, input){
+  const file = input.files[0];
+  if(!file) return;
+  modalPhotoFiles[i] = file;
+  modalPhotoUrls[i] = URL.createObjectURL(file);
+  const img = document.getElementById('mimg'+i);
+  img.src = modalPhotoUrls[i]; img.style.display='block';
+  document.getElementById('mrem'+i).style.display='flex';
+  document.getElementById('mslot'+i).classList.add('filled');
+}
+function removeModalPhoto(e, i){
+  e.stopPropagation();
+  modalPhotoFiles[i] = null; modalPhotoUrls[i] = null;
+  document.getElementById('mimg'+i).style.display='none';
+  document.getElementById('mimg'+i).src='';
+  document.getElementById('mrem'+i).style.display='none';
+  document.getElementById('mslot'+i).classList.remove('filled');
+  document.getElementById('mfile'+i).value='';
+}
+async function savePhotos(){
+  const btn = document.getElementById('savePhotosBtn');
+  if(!modalPhotoUrls[0] && !modalPhotoFiles[0]){ showToast('Add at least one photo'); return; }
+  btn.disabled=true; btn.textContent='Uploading...';
+  try {
+    const finalUrls = [null,null,null];
+    for(let i=0;i<3;i++){
+      if(modalPhotoFiles[i]){
+        const ext = modalPhotoFiles[i].name.split('.').pop();
+        const path = `${phone}/photo${i+1}_${Date.now()}.${ext}`;
+        await db.storage.from('Photos').upload(path, modalPhotoFiles[i], {upsert:true});
+        const { data } = db.storage.from('Photos').getPublicUrl(path);
+        finalUrls[i] = data.publicUrl;
+      } else {
+        finalUrls[i] = modalPhotoUrls[i];
+      }
+    }
+    await db.from('user_media').update({ photo_1:finalUrls[0], photo_2:finalUrls[1], photo_3:finalUrls[2] }).eq('user_id', profileData.user_id);
+    photoUrls = finalUrls;
+    currentPhotoIdx = 0;
+    renderPhotos();
+    closeModal('photos');
+    showToast('Photos updated ✓');
+  } catch(err){ console.error(err); showToast('Upload failed. Try again.'); }
+  btn.disabled=false; btn.textContent='Save photos';
+}
+
+// ── VOICE MODAL
+async function toggleModalRecording(){
+  if(modalAudioBlob) return;
+  if(!modalIsRecording){ await startModalRecording(); }
+  else { stopModalRecording(); }
+}
+async function startModalRecording(){
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+    modalRecorder = new MediaRecorder(stream);
+    modalAudioChunks = [];
+    modalRecorder.ondataavailable = e => modalAudioChunks.push(e.data);
+    modalRecorder.onstop = () => {
+      modalAudioBlob = new Blob(modalAudioChunks, {type:'audio/webm'});
+      stream.getTracks().forEach(t=>t.stop());
+      document.getElementById('modal-playback').style.display='block';
+      document.getElementById('modal-save-voice').style.display='block';
+      document.getElementById('modal-redo').style.display='block';
+      document.getElementById('modal-rec-btn').textContent='✓';
+      document.getElementById('modal-rec-btn').style.background='var(--green)';
+      document.getElementById('modal-rec-status').textContent='Sounds good!';
+    };
+    modalRecorder.start();
+    modalIsRecording = true;
+    modalSecs = 30;
+    document.getElementById('modal-rec-btn').textContent='⏹';
+    document.getElementById('modal-rec-btn').style.animation='sonar 1.5s infinite';
+    document.getElementById('modal-rec-status').textContent='Recording... tap to stop';
+    modalTimer = setInterval(()=>{
+      modalSecs--;
+      const m=Math.floor(modalSecs/60), s=modalSecs%60;
+      document.getElementById('modal-timer').textContent=m+':'+String(s).padStart(2,'0');
+      if(modalSecs<=0){ clearInterval(modalTimer); stopModalRecording(); }
+    },1000);
+  } catch(err){ showToast('Mic access denied. Allow mic and try again.'); }
+}
+function stopModalRecording(){
+  clearInterval(modalTimer);
+  modalIsRecording=false;
+  if(modalRecorder) modalRecorder.stop();
+}
+function playModalVoice(){
+  if(!modalAudioBlob) return;
+  if(modalPlayer && !modalPlayer.paused){ modalPlayer.pause(); document.getElementById('modal-play-btn').textContent='▶'; clearInterval(modalPlayerInterval); return; }
+  if(modalPlayer){ modalPlayer.pause(); }
+  modalPlayer = new Audio(URL.createObjectURL(modalAudioBlob));
+  modalPlayer.play();
+  document.getElementById('modal-play-btn').textContent='⏸';
+  modalPlayerInterval = setInterval(()=>{
+    const pct=(modalPlayer.currentTime/(modalPlayer.duration||1))*100;
+    document.getElementById('modal-play-prog').style.width=pct+'%';
+    if(modalPlayer.ended){ document.getElementById('modal-play-btn').textContent='▶'; clearInterval(modalPlayerInterval); document.getElementById('modal-play-prog').style.width='0%'; }
+  },100);
+}
+function resetModalRecording(){
+  modalAudioBlob=null; modalAudioChunks=[];
+  modalIsRecording=false; modalSecs=30;
+  clearInterval(modalTimer);
+  if(modalPlayer){ modalPlayer.pause(); modalPlayer=null; }
+  document.getElementById('modal-timer').textContent='0:30';
+  document.getElementById('modal-rec-status').textContent='Tap to start recording';
+  document.getElementById('modal-rec-btn').textContent='🎙️';
+  document.getElementById('modal-rec-btn').style.background='var(--rose)';
+  document.getElementById('modal-rec-btn').style.animation='';
+  document.getElementById('modal-playback').style.display='none';
+  document.getElementById('modal-save-voice').style.display='none';
+  document.getElementById('modal-redo').style.display='none';
+  document.getElementById('modal-play-prog').style.width='0%';
+}
+async function saveVoice(){
+  const btn = document.getElementById('modal-save-voice');
+  btn.disabled=true; btn.textContent='Uploading...';
+  try {
+    const path=`${phone}/voice_${Date.now()}.webm`;
+    await db.storage.from('Voice').upload(path, modalAudioBlob, {upsert:true});
+    const { data } = db.storage.from('Voice').getPublicUrl(path);
+    await db.from('user_media').update({voice_url:data.publicUrl}).eq('user_id', profileData.user_id);
+    mediaData.voice_url = data.publicUrl;
+    voiceAudio = new Audio(data.publicUrl);
+    document.getElementById('voicePlayer').style.display='flex';
+    document.getElementById('noVoice').style.display='none';
+    closeModal('voice');
+    resetModalRecording();
+    showToast('Voice note updated ✓');
+  } catch(err){ console.error(err); showToast('Upload failed. Try again.'); }
+  btn.disabled=false; btn.textContent='Save voice note';
+}
+
+// ── QUESTIONS MODAL
+function buildModalQuestions(){
+  modalSelectedQ = {};
+  answersData.forEach(a => {
+    const idx = QUESTIONS.indexOf(a.question);
+    if(idx !== -1) modalSelectedQ[idx] = a.answer;
+  });
+  const pool = document.getElementById('modal-q-pool');
+  pool.innerHTML = '';
+  QUESTIONS.forEach((q,i) => {
+    const isSel = modalSelectedQ[i] !== undefined;
+    const div = document.createElement('div');
+    div.style.cssText='padding:12px 14px;border:1.5px solid '+(isSel?'rgba(232,67,122,0.4)':'rgba(245,237,232,0.1)')+';border-radius:12px;background:'+(isSel?'rgba(232,67,122,0.07)':'rgba(245,237,232,0.02)')+';cursor:pointer;margin-bottom:8px;transition:all 0.2s';
+    div.innerHTML=`<div style="font-size:13px;color:var(--cream);line-height:1.4;margin-bottom:${isSel?'8px':'0'}">${q}</div>
+      <textarea id="mqa${i}" style="display:${isSel?'block':'none'};background:rgba(245,237,232,0.04);border:1px solid rgba(245,237,232,0.1);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--cream);width:100%;resize:none;outline:none;line-height:1.4;min-height:56px;font-family:'DM Sans',sans-serif" maxlength="150" onclick="event.stopPropagation()">${isSel?modalSelectedQ[i]:''}</textarea>`;
+    div.addEventListener('click', ()=>toggleModalQ(i, div));
+    div.setAttribute('id','mqi'+i);
+    pool.appendChild(div);
+  });
+  updateModalQCounter();
+}
+function toggleModalQ(i, el){
+  const isSel = modalSelectedQ[i] !== undefined;
+  const count = Object.keys(modalSelectedQ).length;
+  if(isSel){
+    delete modalSelectedQ[i];
+    el.style.border='1.5px solid rgba(245,237,232,0.1)';
+    el.style.background='rgba(245,237,232,0.02)';
+    document.getElementById('mqa'+i).style.display='none';
+    el.querySelector('div').style.marginBottom='0';
+  } else {
+    if(count>=3){ showToast('Pick 3 max'); return; }
+    modalSelectedQ[i] = document.getElementById('mqa'+i).value;
+    el.style.border='1.5px solid rgba(232,67,122,0.4)';
+    el.style.background='rgba(232,67,122,0.07)';
+    document.getElementById('mqa'+i).style.display='block';
+    el.querySelector('div').style.marginBottom='8px';
+    setTimeout(()=>document.getElementById('mqa'+i).focus(),100);
+  }
+  document.getElementById('mqa'+i).addEventListener('input', function(){ modalSelectedQ[i]=this.value; });
+  updateModalQCounter();
+}
+function updateModalQCounter(){
+  const n=Object.keys(modalSelectedQ).length;
+  document.getElementById('modal-q-counter').textContent=n+' of 3 selected';
+}
+async function saveQuestions(){
+  const keys=Object.keys(modalSelectedQ);
+  if(keys.length<3){ showToast('Select 3 questions'); return; }
+  const unanswered=keys.find(k=>!document.getElementById('mqa'+k).value.trim());
+  if(unanswered!==undefined){ showToast('Answer all 3 questions'); return; }
+  const btn=document.querySelector('#modal-questions .btn-save');
+  btn.disabled=true; btn.textContent='Saving...';
+  try {
+    const rows=keys.map(k=>({user_id:profileData.user_id, question:QUESTIONS[parseInt(k)], answer:document.getElementById('mqa'+k).value.trim()}));
+    await db.from('user_answers').delete().eq('user_id', profileData.user_id);
+    await db.from('user_answers').insert(rows);
+    answersData=rows;
+    renderProfile();
+    closeModal('questions');
+    showToast('Answers updated ✓');
+  } catch(err){ console.error(err); showToast('Error saving.'); }
+  btn.disabled=false; btn.textContent='Save answers';
+}
+
+// ── LOGOUT
+async function handleLogout(){
+  await db.auth.signOut();
+  localStorage.clear();
+  window.location.href='index.html';
+}
+
+// ── TOAST
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ── AUTO LOAD profile on start if on profile tab
+window.addEventListener('load', ()=>{
+  // default to match tab
+});
+</script>
+</body>
+</html>
