@@ -538,6 +538,12 @@ function renderMatchFeed(){
 }
 
 function scrollToCard(i){
+  if(i >= matchProfiles.length){
+    // no more profiles — show empty state
+    document.getElementById('matchFeed').style.display='none';
+    document.getElementById('matchEmpty').style.display='flex';
+    return;
+  }
   const feed = document.getElementById('matchFeed');
   feed.scrollTo({ left: feed.offsetWidth * i, behavior:'smooth' });
 }
