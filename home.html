@@ -617,11 +617,17 @@ async function handleLike(i){
     if(error){ console.error('like insert error:', error); }
     else {
       const {data:mutual} = await db.from('interactions').select('id').eq('from_user_id',p.user_id).eq('to_user_id',currentUserId).eq('action','like').limit(1);
-      if(mutual && mutual.length>0){
-        setTimeout(()=>showToast('🎉 It\'s a match!'),600);
-      } else {
-        setTimeout(()=>showToast('♥ Liked!'),400);
-      }
+     if(mutual && mutual.length>0){
+  // create match row
+  await db.from('matches').insert({
+    user_id_1: currentUserId,
+    user_id_2: p.user_id,
+    status: 'active'
+  });
+  setTimeout(()=>showToast('🎉 It\'s a match! Go to Chat.'),600);
+} else {
+  setTimeout(()=>showToast('♥ Liked!'),400);
+}
     }
   } catch(e){ console.error('like error:', e); }
 
