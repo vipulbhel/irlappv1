@@ -33,7 +33,7 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
 
 /* MATCH TAB */
 #tab-match{overflow:hidden;position:relative}
-.match-feed{position:absolute;inset:0;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.match-feed{position:absolute;inset:0;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x proximity;scroll-behavior:smooth;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .match-feed::-webkit-scrollbar{display:none}
 .match-card{flex:0 0 100%;scroll-snap-align:start;position:relative;height:100%;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
 .mc-photo{position:relative;flex:0 0 55%;overflow:hidden;cursor:pointer}
