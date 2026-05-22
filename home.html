@@ -464,6 +464,19 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
 </div>
 
 <script>
+let currentUserId = localStorage.getItem('irl_li_uid') || null;
+
+async function fetchCurrentUserId(){
+  try {
+    const { data } = await db.from('profiles').select('user_id').eq('phone', phone).limit(1);
+    if(data && data.length > 0 && data[0].user_id){
+      currentUserId = data[0].user_id;
+    }
+  } catch(e){ console.error('fetchUserId error:', e); }
+}
+fetchCurrentUserId();
+
+  
 const { createClient } = window.supabase;
 const db = createClient(
   'https://sxpbdkamagunvktdkogw.supabase.co',
@@ -472,8 +485,20 @@ const db = createClient(
 
 const EDGE_URL = 'https://sxpbdkamagunvktdkogw.supabase.co/functions/v1/get-matches';
 const phone = localStorage.getItem('irl_phone');
-const userId = localStorage.getItem('irl_li_uid');
 if(!phone){ window.location.href = 'index.html'; }
+
+let currentUserId = localStorage.getItem('irl_li_uid') || null;
+
+// fetch user_id from DB immediately on load
+async function fetchCurrentUserId(){
+  try {
+    const { data } = await db.from('profiles').select('user_id').eq('phone', phone).limit(1);
+    if(data && data.length > 0 && data[0].user_id){
+      currentUserId = data[0].user_id;
+    }
+  } catch(e){ console.error('fetchUserId error:', e); }
+}
+fetchCurrentUserId();
 
 // ── STATE
 let profileData = {};
@@ -620,34 +645,38 @@ function toggleCardVoice(i){
 
 async function handlePass(i){
   const p = matchProfiles[i];
+  // disable buttons to prevent double click
+  document.querySelectorAll(`#mc-${i} .mc-pass, #mc-${i} .mc-like`).forEach(b=>b.disabled=true);
   lastPassedProfile = { profile:p, index:i };
-  try { await db.from('interactions').insert({ from_user_id:profileData.user_id||userId, to_user_id:p.user_id, action:'pass' }); } catch(e){ console.error(e); }
+  try {
+    await db.from('interactions').insert({ from_user_id:currentUserId, to_user_id:p.user_id, action:'pass' });
+  } catch(e){ console.error('pass error:', e); }
   document.getElementById('undoText').textContent = 'Passed on ' + (p.full_name||'them');
   showUndoToast();
-  scrollToCard(i+1);
+  setTimeout(()=>scrollToCard(i+1), 300);
 }
 
 async function handleLike(i){
   const p = matchProfiles[i];
-  // show like animation on card
+  // disable buttons to prevent double click
+  document.querySelectorAll(`#mc-${i} .mc-pass, #mc-${i} .mc-like`).forEach(b=>b.disabled=true);
+  // like animation
   const card = document.getElementById('mc-'+i);
   const anim = document.createElement('div');
   anim.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:10;background:rgba(232,67,122,0.15);animation:fadeout 0.8s ease forwards;pointer-events:none';
   anim.innerHTML = '<div style="font-size:80px;animation:heartpop 0.5s ease forwards">♥</div>';
   if(card) card.appendChild(anim);
   setTimeout(()=>{ if(anim.parentNode) anim.parentNode.removeChild(anim); }, 800);
-
   try {
-    await db.from('interactions').insert({ from_user_id:profileData.user_id||userId, to_user_id:p.user_id, action:'like' });
-    const myId = profileData.user_id||userId;
-    const { data: mutual } = await db.from('interactions').select('id').eq('from_user_id',p.user_id).eq('to_user_id',myId).eq('action','like').limit(1);
+    await db.from('interactions').insert({ from_user_id:currentUserId, to_user_id:p.user_id, action:'like' });
+    const { data: mutual } = await db.from('interactions').select('id').eq('from_user_id',p.user_id).eq('to_user_id',currentUserId).eq('action','like').limit(1);
     if(mutual && mutual.length > 0){
       setTimeout(()=>showToast('🎉 It\'s a match! Go to Chat.'), 600);
     } else {
       setTimeout(()=>showToast('♥ Liked!'), 400);
     }
-  } catch(e){ console.error(e); }
-  setTimeout(()=>scrollToCard(i+1), 600);
+  } catch(e){ console.error('like error:', e); }
+  setTimeout(()=>scrollToCard(i+1), 700);
 }
 
 function scrollToCard(i){
