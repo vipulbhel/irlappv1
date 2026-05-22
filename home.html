@@ -630,32 +630,39 @@ async function handleLike(i){
 
 function showUndoToast(){
   clearTimeout(undoTimer);
-  const t=document.getElementById('undoToast');
+  const t = document.getElementById('undoToast');
   t.classList.add('show');
-  undoTimer=setTimeout(()=>{ t.classList.remove('show'); lastPassedProfile=null; },5000);
+  undoTimer = setTimeout(()=>{
+    t.classList.remove('show');
+    lastPassedProfile = null;
+  }, 5000);
 }
 
 async function undoLastPass(){
-  if(!lastPassedProfile) return;
+  if(!lastPassedProfile){ return; }
   clearTimeout(undoTimer);
   document.getElementById('undoToast').classList.remove('show');
   try {
-    await db.from('interactions').delete().eq('from_user_id',currentUserId).eq('to_user_id',lastPassedProfile.profile.user_id).eq('action','pass');
-    // re-enable buttons
-    const passBtn=document.getElementById('pass-'+lastPassedProfile.index);
-    const likeBtn=document.getElementById('like-'+lastPassedProfile.index);
-    if(passBtn) passBtn.disabled=false;
-    if(likeBtn) likeBtn.disabled=false;
-    // re-enable buttons on that card
-const undoPass = document.getElementById('pass-'+lastPassedProfile.index);
-const undoLike = document.getElementById('like-'+lastPassedProfile.index);
-if(undoPass) undoPass.disabled = false;
-if(undoLike) undoLike.disabled = false;
-setTimeout(()=>scrollToCard(lastPassedProfile.index), 100);
-  } catch(e){ console.error(e); }
-  lastPassedProfile=null;
-}
+    await db.from('interactions').delete()
+      .eq('from_user_id', currentUserId)
+      .eq('to_user_id', lastPassedProfile.profile.user_id)
+      .eq('action', 'pass');
 
+    // re-enable buttons
+    const undoPass = document.getElementById('pass-'+lastPassedProfile.index);
+    const undoLike = document.getElementById('like-'+lastPassedProfile.index);
+    if(undoPass) undoPass.disabled = false;
+    if(undoLike) undoLike.disabled = false;
+
+    // if empty state was showing, hide it and show feed again
+    document.getElementById('matchEmpty').style.display = 'none';
+    document.getElementById('matchFeed').style.display = 'flex';
+
+    setTimeout(()=>scrollToCard(lastPassedProfile.index), 100);
+  } catch(e){ console.error(e); }
+  lastPassedProfile = null;
+}
+  
 // FULL PROFILE
 function openFP(i){
   fpProfile=matchProfiles[i];
