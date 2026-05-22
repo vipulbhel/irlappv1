@@ -647,10 +647,10 @@ async function undoLastPass(){
     if(passBtn) passBtn.disabled=false;
     if(likeBtn) likeBtn.disabled=false;
     // re-enable buttons on that card
-const passBtn = document.getElementById('pass-'+lastPassedProfile.index);
-const likeBtn = document.getElementById('like-'+lastPassedProfile.index);
-if(passBtn) passBtn.disabled = false;
-if(likeBtn) likeBtn.disabled = false;
+const undoPass = document.getElementById('pass-'+lastPassedProfile.index);
+const undoLike = document.getElementById('like-'+lastPassedProfile.index);
+if(undoPass) undoPass.disabled = false;
+if(undoLike) undoLike.disabled = false;
 setTimeout(()=>scrollToCard(lastPassedProfile.index), 100);
   } catch(e){ console.error(e); }
   lastPassedProfile=null;
