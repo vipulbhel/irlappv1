@@ -9,11 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#0D0810;--card:#160F1A;--rose:#E8437A;--rose2:#FF6B9D;
-  --cream:#F5EDE8;--muted:#8A7A82;--muted2:#3A3040;
-  --border:rgba(245,237,232,0.08);--green:#34D399;
-}
+:root{--bg:#0D0810;--card:#160F1A;--rose:#E8437A;--rose2:#FF6B9D;--cream:#F5EDE8;--muted:#8A7A82;--muted2:#3A3040;--border:rgba(245,237,232,0.08);--green:#34D399}
 html,body{height:100%;overflow:hidden}
 body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;min-height:100svh;position:relative}
 .amb1{position:fixed;top:-100px;right:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(232,67,122,0.07) 0%,transparent 65%);pointer-events:none;z-index:0}
@@ -28,16 +24,14 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
 .tab-content{position:fixed;top:64px;left:0;right:0;bottom:64px;z-index:1}
 .tab-pane{display:none;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .tab-pane.active{display:flex;flex-direction:column}
-@keyframes fadeup{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
 /* BOTTOM NAV */
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;display:flex;background:rgba(13,8,16,0.95);backdrop-filter:blur(20px);border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom)}
 .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 0;cursor:pointer;transition:color 0.2s;border:none;background:none;color:var(--muted2);gap:4px}
 .nav-item.active{color:var(--rose)}
-.nav-icon{line-height:1}
 .nav-label{font-size:10px;font-weight:500;letter-spacing:0.3px}
 
-/* ── MATCH TAB ── */
+/* MATCH TAB */
 #tab-match{overflow:hidden;position:relative}
 .match-feed{position:absolute;inset:0;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .match-feed::-webkit-scrollbar{display:none}
@@ -53,8 +47,7 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
 .mc-hint{position:absolute;top:14px;right:14px;background:rgba(13,8,16,0.6);backdrop-filter:blur(8px);border:1px solid rgba(245,237,232,0.1);border-radius:100px;padding:5px 12px;font-size:11px;color:rgba(245,237,232,0.7)}
 .mc-bottom{flex:1;display:flex;flex-direction:column;background:var(--card);border-top:1px solid var(--border);overflow:hidden;min-height:0}
 .mc-voice{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:rgba(232,67,122,0.04);flex-shrink:0}
-.mc-play{width:36px;height:36px;border-radius:50%;background:var(--rose);border:none;color:white;font-size:14px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:transform 0.15s}
-.mc-play:active{transform:scale(0.95)}
+.mc-play{width:36px;height:36px;border-radius:50%;background:var(--rose);border:none;color:white;font-size:14px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 .mc-voice-inner{flex:1}
 .mc-voice-label{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
 .mc-waves{display:flex;align-items:center;gap:2px;height:20px}
@@ -67,6 +60,7 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
 .mc-actions{display:flex;gap:10px;padding:12px 16px;flex-shrink:0}
 .mc-pass{flex:1;padding:13px;border-radius:13px;border:1.5px solid rgba(245,237,232,0.1);background:transparent;color:var(--muted);font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all 0.2s}
 .mc-like{flex:2;padding:13px;border-radius:13px;border:none;background:linear-gradient(135deg,#E8437A,#C4306A);color:white;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 6px 20px rgba(232,67,122,0.3);transition:all 0.2s}
+.mc-pass:disabled,.mc-like:disabled{opacity:0.4;cursor:not-allowed}
 .match-center{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:40px 32px}
 
 /* FULL PROFILE OVERLAY */
@@ -89,7 +83,7 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
 .fp-qa{padding:16px}
 .fp-q{font-size:11px;color:var(--muted);letter-spacing:0.3px;margin-bottom:5px}
 .fp-a{font-size:14px;color:var(--cream);line-height:1.65}
-.fp-allqa{padding:16px;display:flex;flex-direction:column;gap:0}
+.fp-allqa{padding:16px}
 .fp-qarow{padding:14px 0;border-bottom:1px solid var(--border)}
 .fp-qarow:first-child{padding-top:0}
 .fp-qarow:last-child{border-bottom:none}
@@ -100,19 +94,19 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
 .undo-toast.show{display:flex}
 .undo-link{color:var(--rose2);font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 
-/* ── EVENTS TAB ── */
+/* EVENTS TAB */
 #tab-events{overflow-y:auto}
 .events-wrap{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;position:relative;overflow:hidden}
 .events-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:300px;height:300px;background:radial-gradient(circle,rgba(232,67,122,0.1) 0%,transparent 70%);pointer-events:none}
-.events-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(232,67,122,0.08);border:1px solid rgba(232,67,122,0.2);border-radius:100px;padding:8px 18px;font-size:11px;color:var(--rose2);letter-spacing:2px;text-transform:uppercase;font-weight:600;margin-bottom:32px;position:relative}
+.events-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(232,67,122,0.08);border:1px solid rgba(232,67,122,0.2);border-radius:100px;padding:8px 18px;font-size:11px;color:var(--rose2);letter-spacing:2px;text-transform:uppercase;font-weight:600;margin-bottom:32px}
 .badge-dot{width:6px;height:6px;border-radius:50%;background:var(--rose);animation:pulse 1.8s infinite}
 @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(232,67,122,0.5)}60%{opacity:0.6;box-shadow:0 0 0 6px rgba(232,67,122,0)}}
-.events-title{font-family:'Syne',sans-serif;font-size:clamp(40px,12vw,72px);font-weight:800;letter-spacing:-3px;line-height:0.95;margin-bottom:20px;position:relative}
+.events-title{font-family:'Syne',sans-serif;font-size:clamp(40px,12vw,72px);font-weight:800;letter-spacing:-3px;line-height:0.95;margin-bottom:20px}
 .events-title em{font-style:italic;color:var(--rose);display:block;font-weight:400}
 .events-title .hollow{-webkit-text-stroke:1.5px rgba(245,237,232,0.2);color:transparent}
-.events-sub{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:36px;font-weight:300;position:relative}
+.events-sub{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:36px;font-weight:300}
 .events-sub b{color:var(--cream)}
-.selection-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:24px;width:100%;max-width:340px;text-align:left;position:relative}
+.selection-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:24px;width:100%;max-width:340px;text-align:left}
 .selection-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:16px}
 .selection-item{display:flex;align-items:center;gap:12px;margin-bottom:12px}
 .selection-item:last-child{margin-bottom:0}
@@ -120,10 +114,7 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
 .sel-text{font-size:13px;color:var(--muted);line-height:1.4}
 .sel-text b{color:var(--cream)}
 
-/* ── CHAT TAB ── */
-#tab-chat{overflow-y:auto}
-
-/* ── PROFILE TAB ── */
+/* PROFILE TAB */
 #tab-profile{overflow-y:auto}
 .profile-wrap{padding:16px}
 .pending-banner{background:rgba(232,67,122,0.08);border:1px solid rgba(232,67,122,0.2);border-radius:14px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--rose2);line-height:1.5}
@@ -149,8 +140,7 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
 .section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
 .section-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;letter-spacing:-0.2px}
 .voice-player{display:flex;align-items:center;gap:14px;background:rgba(245,237,232,0.03);border:1px solid var(--border);border-radius:14px;padding:14px 16px}
-.play-btn{width:44px;height:44px;border-radius:50%;background:var(--rose);border:none;color:white;font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:transform 0.15s}
-.play-btn:hover{transform:scale(1.05)}
+.play-btn{width:44px;height:44px;border-radius:50%;background:var(--rose);border:none;color:white;font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 .voice-progress-wrap{flex:1}
 .voice-progress-bar{height:3px;background:rgba(245,237,232,0.1);border-radius:2px;overflow:hidden;margin-bottom:4px}
 .voice-progress-fill{height:100%;width:0%;background:var(--rose);border-radius:2px;transition:width 0.1s}
@@ -187,53 +177,42 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
 .slot-plus{font-size:20px;color:var(--muted2)}
 .slot-main{font-size:9px;color:var(--muted2);margin-top:3px}
 
-/* DOTS LOADER */
+/* LOADERS & TOAST */
 .dots-loader{display:flex;gap:5px;align-items:center}
 .dots-loader span{width:7px;height:7px;border-radius:50%;background:var(--rose);animation:dotbounce 1.2s infinite ease-in-out}
-.dots-loader span:nth-child(1){animation-delay:0s}
-.dots-loader span:nth-child(2){animation-delay:0.2s}
-.dots-loader span:nth-child(3){animation-delay:0.4s}
+.dots-loader span:nth-child(1){animation-delay:0s}.dots-loader span:nth-child(2){animation-delay:0.2s}.dots-loader span:nth-child(3){animation-delay:0.4s}
 @keyframes dotbounce{0%,80%,100%{transform:scale(0.7);opacity:0.5}40%{transform:scale(1.1);opacity:1}}
-
-/* TOAST */
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--green);color:#080808;padding:10px 24px;border-radius:100px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--green);color:#080808;padding:10px 24px;border-radius:100px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;z-index:400;display:none;white-space:nowrap}
 .toast.show{display:block}
-
 @keyframes fadeout{from{opacity:1}to{opacity:0}}
 @keyframes heartpop{0%{transform:scale(0.5);opacity:0}60%{transform:scale(1.3)}100%{transform:scale(1);opacity:1}}
 </style>
 </head>
 <body>
-
 <div class="amb1"></div>
 <div class="amb2"></div>
 
-<!-- TOP BAR -->
 <div class="topbar">
   <div class="logo">ir<span>l</span></div>
 </div>
 
-<!-- TAB CONTENT -->
 <div class="tab-content">
 
-  <!-- ══ MATCH TAB ══ -->
+  <!-- MATCH TAB -->
   <div class="tab-pane active" id="tab-match">
-    <!-- loading -->
     <div id="matchLoading" class="match-center">
       <div class="dots-loader"><span></span><span></span><span></span></div>
       <div style="font-size:13px;color:var(--muted);margin-top:12px">Finding your matches...</div>
     </div>
-    <!-- feed -->
     <div class="match-feed" id="matchFeed" style="display:none"></div>
-    <!-- empty -->
     <div id="matchEmpty" class="match-center" style="display:none">
       <div style="font-size:48px;margin-bottom:16px">✨</div>
       <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-0.5px;margin-bottom:8px">You're all caught up.</div>
-      <div style="font-size:14px;color:var(--muted);line-height:1.6;max-width:260px">No new profiles right now. Check back soon — new members join every day.</div>
+      <div style="font-size:14px;color:var(--muted);line-height:1.6;max-width:260px">No new profiles right now. Check back soon.</div>
     </div>
   </div>
 
-  <!-- ══ CHAT TAB ══ -->
+  <!-- CHAT TAB -->
   <div class="tab-pane" id="tab-chat">
     <div class="match-center">
       <div style="font-size:48px;margin-bottom:16px">💬</div>
@@ -242,16 +221,12 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
     </div>
   </div>
 
-  <!-- ══ EVENTS TAB ══ -->
+  <!-- EVENTS TAB -->
   <div class="tab-pane" id="tab-events">
     <div class="events-wrap">
       <div class="events-glow"></div>
       <div class="events-badge"><div class="badge-dot"></div>Coming soon</div>
-      <h1 class="events-title">
-        Something
-        <em>real</em>
-        <span class="hollow">is coming.</span>
-      </h1>
+      <h1 class="events-title">Something<em>real</em><span class="hollow">is coming.</span></h1>
       <p class="events-sub">The first exclusive IRL event is being planned.<br><b>Not everyone gets in.</b></p>
       <div class="selection-card">
         <div class="selection-title">How to get selected</div>
@@ -262,7 +237,7 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
     </div>
   </div>
 
-  <!-- ══ PROFILE TAB ══ -->
+  <!-- PROFILE TAB -->
   <div class="tab-pane" id="tab-profile">
     <div class="profile-wrap">
       <div class="pending-banner" id="pendingBanner" style="display:none">⏳ Your profile is under review. We'll notify you on WhatsApp once approved.</div>
@@ -320,27 +295,19 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
   <button class="nav-item active" id="nav-match" onclick="switchTab('match')">
-    <span class="nav-icon">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-    </span>
+    <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span>
     <span class="nav-label">Match</span>
   </button>
   <button class="nav-item" id="nav-chat" onclick="switchTab('chat')">
-    <span class="nav-icon">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-    </span>
+    <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
     <span class="nav-label">Chat</span>
   </button>
   <button class="nav-item" id="nav-events" onclick="switchTab('events')">
-    <span class="nav-icon">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-    </span>
+    <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
     <span class="nav-label">Events</span>
   </button>
   <button class="nav-item" id="nav-profile" onclick="switchTab('profile')">
-    <span class="nav-icon">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    </span>
+    <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
     <span class="nav-label">Profile</span>
   </button>
 </nav>
@@ -364,8 +331,8 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
   <div id="fpBlocks"></div>
   <div style="height:80px"></div>
   <div class="fp-actions">
-    <button class="mc-pass" onclick="handleFPPass()">✕ Pass</button>
-    <button class="mc-like" onclick="handleFPLike()">♥ Like</button>
+    <button class="mc-pass" id="fpPassBtn" onclick="handleFPPass()">✕ Pass</button>
+    <button class="mc-like" id="fpLikeBtn" onclick="handleFPLike()">♥ Like</button>
   </div>
 </div>
 
@@ -391,15 +358,9 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
       <div class="modal-gpill" id="edit-gf" onclick="selectEditGender('female')">Woman</div>
     </div>
     <label class="modal-label">City</label>
-    <select id="edit-city">
-      <option value="">Select city</option>
-      <option>Mumbai</option><option>Delhi NCR</option><option>Bengaluru</option><option>Pune</option>
-    </select>
+    <select id="edit-city"><option value="">Select city</option><option>Mumbai</option><option>Delhi NCR</option><option>Bengaluru</option><option>Pune</option></select>
     <label class="modal-label">Looking for</label>
-    <select id="edit-intent">
-      <option value="">Select intent</option>
-      <option>Serious</option><option>Casual</option><option>Open</option>
-    </select>
+    <select id="edit-intent"><option value="">Select intent</option><option>Serious</option><option>Casual</option><option>Open</option></select>
     <button class="btn-save" onclick="saveBasic()">Save changes</button>
   </div>
 </div>
@@ -408,20 +369,11 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
   <div class="modal" style="position:relative">
     <div class="modal-title">Edit photos</div>
     <button class="modal-close" onclick="closeModal('photos')">✕</button>
-    <p style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.5">First photo is mandatory. Tap to change.</p>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.5">First photo is mandatory.</p>
     <div class="modal-photo-grid">
-      <div class="modal-photo-slot" id="mslot0" onclick="triggerModalUpload(0)">
-        <img id="mimg0" src="" style="display:none"/><button class="rem" id="mrem0" style="display:none" onclick="removeModalPhoto(event,0)">✕</button>
-        <span class="slot-plus">📷</span><span class="slot-main">Main</span>
-      </div>
-      <div class="modal-photo-slot" id="mslot1" onclick="triggerModalUpload(1)">
-        <img id="mimg1" src="" style="display:none"/><button class="rem" id="mrem1" style="display:none" onclick="removeModalPhoto(event,1)">✕</button>
-        <span class="slot-plus">＋</span>
-      </div>
-      <div class="modal-photo-slot" id="mslot2" onclick="triggerModalUpload(2)">
-        <img id="mimg2" src="" style="display:none"/><button class="rem" id="mrem2" style="display:none" onclick="removeModalPhoto(event,2)">✕</button>
-        <span class="slot-plus">＋</span>
-      </div>
+      <div class="modal-photo-slot" id="mslot0" onclick="triggerModalUpload(0)"><img id="mimg0" src="" style="display:none"/><button class="rem" id="mrem0" style="display:none" onclick="removeModalPhoto(event,0)">✕</button><span class="slot-plus">📷</span><span class="slot-main">Main</span></div>
+      <div class="modal-photo-slot" id="mslot1" onclick="triggerModalUpload(1)"><img id="mimg1" src="" style="display:none"/><button class="rem" id="mrem1" style="display:none" onclick="removeModalPhoto(event,1)">✕</button><span class="slot-plus">＋</span></div>
+      <div class="modal-photo-slot" id="mslot2" onclick="triggerModalUpload(2)"><img id="mimg2" src="" style="display:none"/><button class="rem" id="mrem2" style="display:none" onclick="removeModalPhoto(event,2)">✕</button><span class="slot-plus">＋</span></div>
     </div>
     <input type="file" id="mfile0" accept="image/*" onchange="handleModalPhoto(0,this)" style="display:none"/>
     <input type="file" id="mfile1" accept="image/*" onchange="handleModalPhoto(1,this)" style="display:none"/>
@@ -448,7 +400,7 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
       </div>
     </div>
     <button id="modal-save-voice" class="btn-save" onclick="saveVoice()" style="display:none">Save voice note</button>
-    <button onclick="resetModalRecording()" style="width:100%;background:none;border:1px solid var(--border);border-radius:13px;padding:13px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);cursor:pointer;margin-top:8px" id="modal-redo" style="display:none">Record again</button>
+    <button onclick="resetModalRecording()" id="modal-redo" style="display:none;width:100%;background:none;border:1px solid var(--border);border-radius:13px;padding:13px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);cursor:pointer;margin-top:8px">Record again</button>
   </div>
 </div>
 
@@ -464,69 +416,42 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
 </div>
 
 <script>
-let currentUserId = localStorage.getItem('irl_li_uid') || null;
-
-async function fetchCurrentUserId(){
-  try {
-    const { data } = await db.from('profiles').select('user_id').eq('phone', phone).limit(1);
-    if(data && data.length > 0 && data[0].user_id){
-      currentUserId = data[0].user_id;
-    }
-  } catch(e){ console.error('fetchUserId error:', e); }
-}
-fetchCurrentUserId();
-
-  
+// ── SUPABASE
 const { createClient } = window.supabase;
 const db = createClient(
   'https://sxpbdkamagunvktdkogw.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4cGJka2FtYWd1bnZrdGRrb2d3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwMDc3NDUsImV4cCI6MjA5NDU4Mzc0NX0.rTQeSH2dWSLP0IxwewvvEn3qxIbRQcCMZVjpr_0_LJ8'
 );
-
 const EDGE_URL = 'https://sxpbdkamagunvktdkogw.supabase.co/functions/v1/get-matches';
+const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4cGJka2FtYWd1bnZrdGRrb2d3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwMDc3NDUsImV4cCI6MjA5NDU4Mzc0NX0.rTQeSH2dWSLP0IxwewvvEn3qxIbRQcCMZVjpr_0_LJ8';
+
 const phone = localStorage.getItem('irl_phone');
-if(!phone){ window.location.href = 'index.html'; }
+if(!phone){ window.location.href='index.html'; }
 
-let currentUserId = localStorage.getItem('irl_li_uid') || null;
+// ── CURRENT USER ID — fetched fresh from DB
+let currentUserId = null;
 
-// fetch user_id from DB immediately on load
 async function fetchCurrentUserId(){
   try {
     const { data } = await db.from('profiles').select('user_id').eq('phone', phone).limit(1);
-    if(data && data.length > 0 && data[0].user_id){
-      currentUserId = data[0].user_id;
-    }
-  } catch(e){ console.error('fetchUserId error:', e); }
+    if(data && data.length > 0) currentUserId = data[0].user_id;
+    console.log('currentUserId:', currentUserId);
+  } catch(e){ console.error('fetchUserId:', e); }
 }
-fetchCurrentUserId();
 
 // ── STATE
-let profileData = {};
-let mediaData = {};
-let answersData = [];
-let currentPhotoIdx = 0;
-let photoUrls = [null, null, null];
-let modalPhotoFiles = [null, null, null];
-let modalPhotoUrls = [null, null, null];
-let voiceAudio = null;
-let voiceInterval = null;
-let modalRecorder = null;
-let modalAudioChunks = [];
-let modalAudioBlob = null;
-let modalIsRecording = false;
-let modalSecs = 30;
-let modalTimer = null;
-let modalPlayer = null;
-let modalPlayerInterval = null;
+let profileData = {}, mediaData = {}, answersData = [];
+let currentPhotoIdx = 0, photoUrls = [null,null,null];
+let modalPhotoFiles = [null,null,null], modalPhotoUrls = [null,null,null];
+let voiceAudio = null, voiceInterval = null;
+let modalRecorder=null, modalAudioChunks=[], modalAudioBlob=null;
+let modalIsRecording=false, modalSecs=30, modalTimer=null;
+let modalPlayer=null, modalPlayerInterval=null;
 let editGender = '';
-let matchProfiles = [];
-let fpProfile = null;
-let fpAudio = null;
-let fpAudioInterval = null;
+let matchProfiles = [], fpProfile = null;
+let fpAudio = null, fpAudioInterval = null;
 let cardAudios = {};
-let lastPassedProfile = null;
-let undoTimer = null;
-let matchLoaded = false;
+let lastPassedProfile = null, undoTimer = null;
 let profileLoaded = false;
 
 const QUESTIONS = [
@@ -541,61 +466,57 @@ let modalSelectedQ = {};
 
 // ── TAB SWITCHING
 function switchTab(tab){
-  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('tab-'+tab).classList.add('active');
   document.getElementById('nav-'+tab).classList.add('active');
-  if(tab === 'profile' && !profileLoaded){ profileLoaded = true; loadProfile(); }
-  if(tab === 'match' && !matchLoaded){ matchLoaded = true; loadMatches(); }
+  if(tab==='profile' && !profileLoaded){ profileLoaded=true; loadProfile(); }
 }
 
-// ── MATCH FUNCTIONS
+// ── MATCH
 async function loadMatches(){
   try {
     const res = await fetch(EDGE_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4cGJka2FtYWd1bnZrdGRrb2d3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwMDc3NDUsImV4cCI6MjA5NDU4Mzc0NX0.rTQeSH2dWSLP0IxwewvvEn3qxIbRQcCMZVjpr_0_LJ8' },
-      body: JSON.stringify({ phone })
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+ANON},
+      body: JSON.stringify({phone})
     });
     const data = await res.json();
+    console.log('match response:', data);
     matchProfiles = data.profiles || [];
-    document.getElementById('matchLoading').style.display = 'none';
+    document.getElementById('matchLoading').style.display='none';
     if(matchProfiles.length === 0){
-      document.getElementById('matchEmpty').style.display = 'flex';
+      document.getElementById('matchEmpty').style.display='flex';
     } else {
       renderMatchFeed();
     }
   } catch(err){
-    console.error('Match load error:', err);
-    document.getElementById('matchLoading').style.display = 'none';
-    document.getElementById('matchEmpty').style.display = 'flex';
+    console.error('loadMatches error:', err);
+    document.getElementById('matchLoading').style.display='none';
+    document.getElementById('matchEmpty').style.display='flex';
   }
 }
 
 function renderMatchFeed(){
   const feed = document.getElementById('matchFeed');
   feed.innerHTML = '';
-  matchProfiles.forEach((p, i) => {
-    const photos = [p.photo_1, p.photo_2, p.photo_3].filter(Boolean);
+  matchProfiles.forEach((p,i)=>{
+    const photos = [p.photo_1,p.photo_2,p.photo_3].filter(Boolean);
     const card = document.createElement('div');
-    card.className = 'match-card';
-    card.id = 'mc-' + i;
-    card.innerHTML = `
+    card.className='match-card'; card.id='mc-'+i;
+    card.innerHTML=`
       <div class="mc-photo" onclick="openFP(${i})">
         <img src="${photos[0]||''}" loading="lazy"/>
         <div class="mc-overlay"></div>
         <div class="mc-info">
           <div class="mc-name">${p.full_name||'—'}, ${p.age||'—'}</div>
-          <div class="mc-meta">
-            <span class="mc-city">${p.city||'—'}</span>
-            <div class="mc-intent">${p.intent||'—'}</div>
-          </div>
+          <div class="mc-meta"><span class="mc-city">${p.city||'—'}</span><div class="mc-intent">${p.intent||'—'}</div></div>
         </div>
         <div class="mc-hint">Tap for full profile</div>
       </div>
       <div class="mc-bottom">
         <div class="mc-voice">
-          <button class="mc-play" id="mcplay-${i}" onclick="toggleCardVoice(${i})">▶</button>
+          <button class="mc-play" id="mcplay-${i}" onclick="event.stopPropagation();toggleCardVoice(${i})">▶</button>
           <div class="mc-voice-inner">
             <div class="mc-voice-label">Voice intro</div>
             <div class="mc-waves" id="mcwaves-${i}">
@@ -607,89 +528,105 @@ function renderMatchFeed(){
         </div>
         <div class="mc-counter">${i+1} of ${matchProfiles.length}</div>
         <div class="mc-actions">
-          <button class="mc-pass" onclick="handlePass(${i})">✕ Pass</button>
-          <button class="mc-like" onclick="handleLike(${i})">♥ Like</button>
+          <button class="mc-pass" id="pass-${i}" onclick="handlePass(${i})">✕ Pass</button>
+          <button class="mc-like" id="like-${i}" onclick="handleLike(${i})">♥ Like</button>
         </div>
-      </div>
-    `;
+      </div>`;
     feed.appendChild(card);
   });
-  feed.style.display = 'flex';
+  feed.style.display='flex';
+}
+
+function scrollToCard(i){
+  const feed = document.getElementById('matchFeed');
+  feed.scrollTo({ left: feed.offsetWidth * i, behavior:'smooth' });
 }
 
 function toggleCardVoice(i){
   const p = matchProfiles[i];
   if(!p||!p.voice_url) return;
-  const btn = document.getElementById('mcplay-'+i);
-  const waves = document.getElementById('mcwaves-'+i);
-  Object.keys(cardAudios).forEach(k => {
-    if(k != i && cardAudios[k] && !cardAudios[k].paused){
+  const btn=document.getElementById('mcplay-'+i);
+  const waves=document.getElementById('mcwaves-'+i);
+  Object.keys(cardAudios).forEach(k=>{
+    if(k!=i && cardAudios[k] && !cardAudios[k].paused){
       cardAudios[k].pause();
-      const ob = document.getElementById('mcplay-'+k);
-      const ow = document.getElementById('mcwaves-'+k);
+      const ob=document.getElementById('mcplay-'+k);
+      const ow=document.getElementById('mcwaves-'+k);
       if(ob) ob.textContent='▶';
       if(ow) ow.querySelectorAll('.mc-wave').forEach(w=>w.classList.remove('playing'));
     }
   });
-  if(!cardAudios[i]) cardAudios[i] = new Audio(p.voice_url);
-  const audio = cardAudios[i];
+  if(!cardAudios[i]) cardAudios[i]=new Audio(p.voice_url);
+  const audio=cardAudios[i];
   if(!audio.paused){
     audio.pause(); btn.textContent='▶';
     waves.querySelectorAll('.mc-wave').forEach(w=>w.classList.remove('playing'));
   } else {
     audio.play(); btn.textContent='⏸';
     waves.querySelectorAll('.mc-wave').forEach(w=>w.classList.add('playing'));
-    audio.onended = ()=>{ btn.textContent='▶'; waves.querySelectorAll('.mc-wave').forEach(w=>w.classList.remove('playing')); };
+    audio.onended=()=>{ btn.textContent='▶'; waves.querySelectorAll('.mc-wave').forEach(w=>w.classList.remove('playing')); };
   }
 }
 
 async function handlePass(i){
-  const p = matchProfiles[i];
-  // disable buttons to prevent double click
-  document.querySelectorAll(`#mc-${i} .mc-pass, #mc-${i} .mc-like`).forEach(b=>b.disabled=true);
-  lastPassedProfile = { profile:p, index:i };
+  // disable both buttons immediately
+  const passBtn=document.getElementById('pass-'+i);
+  const likeBtn=document.getElementById('like-'+i);
+  if(passBtn) passBtn.disabled=true;
+  if(likeBtn) likeBtn.disabled=true;
+
+  const p=matchProfiles[i];
+  lastPassedProfile={profile:p,index:i};
+
   try {
-    await db.from('interactions').insert({ from_user_id:currentUserId, to_user_id:p.user_id, action:'pass' });
+    console.log('inserting pass, currentUserId:', currentUserId, 'to:', p.user_id);
+    const {error} = await db.from('interactions').insert({from_user_id:currentUserId, to_user_id:p.user_id, action:'pass'});
+    if(error) console.error('pass insert error:', error);
   } catch(e){ console.error('pass error:', e); }
-  document.getElementById('undoText').textContent = 'Passed on ' + (p.full_name||'them');
+
+  document.getElementById('undoText').textContent='Passed on '+(p.full_name||'them');
   showUndoToast();
-  setTimeout(()=>scrollToCard(i+1), 300);
+  setTimeout(()=>scrollToCard(i+1), 400);
 }
 
 async function handleLike(i){
-  const p = matchProfiles[i];
-  // disable buttons to prevent double click
-  document.querySelectorAll(`#mc-${i} .mc-pass, #mc-${i} .mc-like`).forEach(b=>b.disabled=true);
-  // like animation
-  const card = document.getElementById('mc-'+i);
-  const anim = document.createElement('div');
-  anim.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:10;background:rgba(232,67,122,0.15);animation:fadeout 0.8s ease forwards;pointer-events:none';
-  anim.innerHTML = '<div style="font-size:80px;animation:heartpop 0.5s ease forwards">♥</div>';
+  const passBtn=document.getElementById('pass-'+i);
+  const likeBtn=document.getElementById('like-'+i);
+  if(passBtn) passBtn.disabled=true;
+  if(likeBtn) likeBtn.disabled=true;
+
+  const p=matchProfiles[i];
+
+  // heart animation
+  const card=document.getElementById('mc-'+i);
+  const anim=document.createElement('div');
+  anim.style.cssText='position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:10;background:rgba(232,67,122,0.15);animation:fadeout 0.8s ease forwards;pointer-events:none';
+  anim.innerHTML='<div style="font-size:80px;animation:heartpop 0.5s ease forwards;color:var(--rose)">♥</div>';
   if(card) card.appendChild(anim);
-  setTimeout(()=>{ if(anim.parentNode) anim.parentNode.removeChild(anim); }, 800);
+  setTimeout(()=>{ if(anim.parentNode) anim.parentNode.removeChild(anim); },800);
+
   try {
-    await db.from('interactions').insert({ from_user_id:currentUserId, to_user_id:p.user_id, action:'like' });
-    const { data: mutual } = await db.from('interactions').select('id').eq('from_user_id',p.user_id).eq('to_user_id',currentUserId).eq('action','like').limit(1);
-    if(mutual && mutual.length > 0){
-      setTimeout(()=>showToast('🎉 It\'s a match! Go to Chat.'), 600);
-    } else {
-      setTimeout(()=>showToast('♥ Liked!'), 400);
+    console.log('inserting like, currentUserId:', currentUserId, 'to:', p.user_id);
+    const {error} = await db.from('interactions').insert({from_user_id:currentUserId, to_user_id:p.user_id, action:'like'});
+    if(error){ console.error('like insert error:', error); }
+    else {
+      const {data:mutual} = await db.from('interactions').select('id').eq('from_user_id',p.user_id).eq('to_user_id',currentUserId).eq('action','like').limit(1);
+      if(mutual && mutual.length>0){
+        setTimeout(()=>showToast('🎉 It\'s a match!'),600);
+      } else {
+        setTimeout(()=>showToast('♥ Liked!'),400);
+      }
     }
   } catch(e){ console.error('like error:', e); }
-  setTimeout(()=>scrollToCard(i+1), 700);
-}
 
-function scrollToCard(i){
-  const feed = document.getElementById('matchFeed');
-  const cardWidth = feed.offsetWidth;
-  feed.scrollTo({ left: cardWidth * i, behavior: 'smooth' });
+  setTimeout(()=>scrollToCard(i+1),700);
 }
 
 function showUndoToast(){
   clearTimeout(undoTimer);
-  const t = document.getElementById('undoToast');
+  const t=document.getElementById('undoToast');
   t.classList.add('show');
-  undoTimer = setTimeout(()=>{ t.classList.remove('show'); lastPassedProfile=null; }, 5000);
+  undoTimer=setTimeout(()=>{ t.classList.remove('show'); lastPassedProfile=null; },5000);
 }
 
 async function undoLastPass(){
@@ -697,60 +634,65 @@ async function undoLastPass(){
   clearTimeout(undoTimer);
   document.getElementById('undoToast').classList.remove('show');
   try {
-    const myId = profileData.user_id||userId;
-    await db.from('interactions').delete().eq('from_user_id',myId).eq('to_user_id',lastPassedProfile.profile.user_id).eq('action','pass');
+    await db.from('interactions').delete().eq('from_user_id',currentUserId).eq('to_user_id',lastPassedProfile.profile.user_id).eq('action','pass');
+    // re-enable buttons
+    const passBtn=document.getElementById('pass-'+lastPassedProfile.index);
+    const likeBtn=document.getElementById('like-'+lastPassedProfile.index);
+    if(passBtn) passBtn.disabled=false;
+    if(likeBtn) likeBtn.disabled=false;
     scrollToCard(lastPassedProfile.index);
   } catch(e){ console.error(e); }
-  lastPassedProfile = null;
+  lastPassedProfile=null;
 }
 
+// FULL PROFILE
 function openFP(i){
-  fpProfile = matchProfiles[i];
-  const p = fpProfile;
-  const photos = [p.photo_1, p.photo_2, p.photo_3].filter(Boolean);
-  document.getElementById('fpTitle').textContent = (p.full_name||'—') + ', ' + (p.age||'—');
+  fpProfile=matchProfiles[i];
+  const p=fpProfile;
+  const photos=[p.photo_1,p.photo_2,p.photo_3].filter(Boolean);
+  document.getElementById('fpTitle').textContent=(p.full_name||'—')+', '+(p.age||'—');
   if(fpAudio){ fpAudio.pause(); clearInterval(fpAudioInterval); }
-  document.getElementById('fpVPlay').textContent = '▶';
-  document.getElementById('fpVFill').style.width = '0%';
-  document.getElementById('fpVTime').textContent = '0:00';
-  fpAudio = p.voice_url ? new Audio(p.voice_url) : null;
-  const blocks = document.getElementById('fpBlocks');
-  blocks.innerHTML = '';
-  const answers = p.answers || [];
-  if(photos.length === 1){
-    blocks.innerHTML = `<div class="fp-block"><img src="${photos[0]}" loading="lazy"/></div><div class="fp-allqa">${answers.map(a=>`<div class="fp-qarow"><div class="fp-q">${a.question}</div><div class="fp-a">${a.answer}</div></div>`).join('')}</div>`;
+  document.getElementById('fpVPlay').textContent='▶';
+  document.getElementById('fpVFill').style.width='0%';
+  document.getElementById('fpVTime').textContent='0:00';
+  fpAudio=p.voice_url?new Audio(p.voice_url):null;
+  const blocks=document.getElementById('fpBlocks');
+  blocks.innerHTML='';
+  const answers=p.answers||[];
+  if(photos.length===1){
+    blocks.innerHTML=`<div class="fp-block"><img src="${photos[0]}" loading="lazy"/></div><div class="fp-allqa">${answers.map(a=>`<div class="fp-qarow"><div class="fp-q">${a.question}</div><div class="fp-a">${a.answer}</div></div>`).join('')}</div>`;
   } else {
     photos.forEach((photo,pi)=>{
-      const ans = answers[pi];
-      blocks.innerHTML += `<div class="fp-block"><img src="${photo}" loading="lazy"/>${ans?`<div class="fp-qa"><div class="fp-q">${ans.question}</div><div class="fp-a">${ans.answer}</div></div>`:''}</div>`;
+      const ans=answers[pi];
+      blocks.innerHTML+=`<div class="fp-block"><img src="${photo}" loading="lazy"/>${ans?`<div class="fp-qa"><div class="fp-q">${ans.question}</div><div class="fp-a">${ans.answer}</div></div>`:''}</div>`;
     });
-    if(answers.length > photos.length){
-      blocks.innerHTML += `<div class="fp-allqa">${answers.slice(photos.length).map(a=>`<div class="fp-qarow"><div class="fp-q">${a.question}</div><div class="fp-a">${a.answer}</div></div>`).join('')}</div>`;
+    if(answers.length>photos.length){
+      blocks.innerHTML+=`<div class="fp-allqa">${answers.slice(photos.length).map(a=>`<div class="fp-qarow"><div class="fp-q">${a.question}</div><div class="fp-a">${a.answer}</div></div>`).join('')}</div>`;
     }
   }
   document.getElementById('fpOverlay').classList.add('show');
-  document.getElementById('fpOverlay').scrollTop = 0;
+  document.getElementById('fpOverlay').scrollTop=0;
   if(fpAudio){
     fpAudio.play().catch(()=>{});
-    document.getElementById('fpVPlay').textContent = '⏸';
-    fpAudioInterval = setInterval(()=>{
+    document.getElementById('fpVPlay').textContent='⏸';
+    fpAudioInterval=setInterval(()=>{
       if(!fpAudio) return;
-      const pct = (fpAudio.currentTime/(fpAudio.duration||1))*100;
-      document.getElementById('fpVFill').style.width = pct+'%';
-      const s = Math.floor(fpAudio.currentTime);
-      document.getElementById('fpVTime').textContent = '0:'+String(s).padStart(2,'0');
+      const pct=(fpAudio.currentTime/(fpAudio.duration||1))*100;
+      document.getElementById('fpVFill').style.width=pct+'%';
+      const s=Math.floor(fpAudio.currentTime);
+      document.getElementById('fpVTime').textContent='0:'+String(s).padStart(2,'0');
       if(fpAudio.ended){ document.getElementById('fpVPlay').textContent='▶'; clearInterval(fpAudioInterval); }
-    }, 100);
+    },100);
   }
 }
 
 function toggleFPVoice(){
   if(!fpAudio) return;
-  const btn = document.getElementById('fpVPlay');
+  const btn=document.getElementById('fpVPlay');
   if(!fpAudio.paused){ fpAudio.pause(); btn.textContent='▶'; clearInterval(fpAudioInterval); }
   else {
     fpAudio.play(); btn.textContent='⏸';
-    fpAudioInterval = setInterval(()=>{
+    fpAudioInterval=setInterval(()=>{
       const pct=(fpAudio.currentTime/(fpAudio.duration||1))*100;
       document.getElementById('fpVFill').style.width=pct+'%';
       const s=Math.floor(fpAudio.currentTime);
@@ -766,80 +708,73 @@ function closeFP(){
 }
 
 function handleFPPass(){
-  const idx = matchProfiles.indexOf(fpProfile);
+  const idx=matchProfiles.indexOf(fpProfile);
   closeFP();
-  if(idx !== -1) setTimeout(()=>handlePass(idx), 300);
+  if(idx!==-1) setTimeout(()=>handlePass(idx),300);
 }
-
 function handleFPLike(){
-  const idx = matchProfiles.indexOf(fpProfile);
+  const idx=matchProfiles.indexOf(fpProfile);
   closeFP();
-  if(idx !== -1) setTimeout(()=>handleLike(idx), 300);
+  if(idx!==-1) setTimeout(()=>handleLike(idx),300);
 }
 
-// ── PROFILE FUNCTIONS
+// PROFILE TAB
 async function loadProfile(){
   try {
-    const { data: prof } = await db.from('profiles').select('*').eq('phone', phone).limit(1);
-    if(!prof || !prof.length) return;
-    profileData = prof[0];
-    if(profileData.status === 'pending') document.getElementById('pendingBanner').style.display = 'flex';
-    const { data: media } = await db.from('user_media').select('*').eq('user_id', profileData.user_id).limit(1);
-    if(media && media.length) mediaData = media[0];
-    const { data: answers } = await db.from('user_answers').select('*').eq('user_id', profileData.user_id);
-    if(answers) answersData = answers;
+    const {data:prof}=await db.from('profiles').select('*').eq('phone',phone).limit(1);
+    if(!prof||!prof.length) return;
+    profileData=prof[0];
+    if(profileData.status==='pending') document.getElementById('pendingBanner').style.display='flex';
+    const {data:media}=await db.from('user_media').select('*').eq('user_id',profileData.user_id).limit(1);
+    if(media&&media.length) mediaData=media[0];
+    const {data:answers}=await db.from('user_answers').select('*').eq('user_id',profileData.user_id);
+    if(answers) answersData=answers;
     renderProfile();
-    document.getElementById('profileLoading').style.display = 'none';
-    document.getElementById('profileContent').style.display = 'block';
+    document.getElementById('profileLoading').style.display='none';
+    document.getElementById('profileContent').style.display='block';
   } catch(err){ console.error(err); }
 }
 
 function renderProfile(){
-  document.getElementById('displayName').textContent = profileData.full_name || '—';
-  document.getElementById('displayMeta').textContent = (profileData.age||'—') + ' · ' + (profileData.city||'—');
-  document.getElementById('displayIntent').textContent = profileData.intent || '—';
-  photoUrls = [mediaData.photo_1||null, mediaData.photo_2||null, mediaData.photo_3||null];
+  document.getElementById('displayName').textContent=profileData.full_name||'—';
+  document.getElementById('displayMeta').textContent=(profileData.age||'—')+' · '+(profileData.city||'—');
+  document.getElementById('displayIntent').textContent=profileData.intent||'—';
+  photoUrls=[mediaData.photo_1||null,mediaData.photo_2||null,mediaData.photo_3||null];
   renderPhotos();
   if(mediaData.voice_url){
-    document.getElementById('voicePlayer').style.display = 'flex';
-    document.getElementById('noVoice').style.display = 'none';
-    voiceAudio = new Audio(mediaData.voice_url);
+    document.getElementById('voicePlayer').style.display='flex';
+    document.getElementById('noVoice').style.display='none';
+    voiceAudio=new Audio(mediaData.voice_url);
   } else {
-    document.getElementById('voicePlayer').style.display = 'none';
-    document.getElementById('noVoice').style.display = 'block';
+    document.getElementById('voicePlayer').style.display='none';
+    document.getElementById('noVoice').style.display='block';
   }
-  const qWrap = document.getElementById('questionsDisplay');
-  qWrap.innerHTML = '';
-  if(answersData.length === 0){
-    qWrap.innerHTML = '<p style="font-size:13px;color:var(--muted);text-align:center;padding:8px 0">No answers yet.</p>';
-  } else {
-    answersData.forEach(a => {
-      qWrap.innerHTML += `<div class="q-item-view"><div class="q-question">${a.question}</div><div class="q-answer">${a.answer}</div></div>`;
-    });
-  }
+  const qWrap=document.getElementById('questionsDisplay');
+  qWrap.innerHTML='';
+  if(answersData.length===0){ qWrap.innerHTML='<p style="font-size:13px;color:var(--muted);text-align:center;padding:8px 0">No answers yet.</p>'; }
+  else { answersData.forEach(a=>{ qWrap.innerHTML+=`<div class="q-item-view"><div class="q-question">${a.question}</div><div class="q-answer">${a.answer}</div></div>`; }); }
 }
 
 function renderPhotos(){
-  const valid = photoUrls.filter(u=>u);
-  const img = document.getElementById('mainPhoto');
-  const ph = document.getElementById('photoPlaceholder');
-  const counter = document.getElementById('photoCounter');
-  const dots = document.getElementById('photoDots');
-  if(valid.length === 0){ img.style.display='none'; ph.style.display='flex'; counter.style.display='none'; dots.innerHTML=''; return; }
-  img.src = valid[currentPhotoIdx]||valid[0];
-  img.style.display='block'; ph.style.display='none';
+  const valid=photoUrls.filter(u=>u);
+  const img=document.getElementById('mainPhoto');
+  const ph=document.getElementById('photoPlaceholder');
+  const counter=document.getElementById('photoCounter');
+  const dots=document.getElementById('photoDots');
+  if(valid.length===0){ img.style.display='none'; ph.style.display='flex'; counter.style.display='none'; dots.innerHTML=''; return; }
+  img.src=valid[currentPhotoIdx]||valid[0]; img.style.display='block'; ph.style.display='none';
   counter.style.display='block'; counter.textContent=(currentPhotoIdx+1)+'/'+valid.length;
-  dots.innerHTML = valid.map((_,i)=>`<div class="photo-dot ${i===currentPhotoIdx?'active':''}"></div>`).join('');
+  dots.innerHTML=valid.map((_,i)=>`<div class="photo-dot ${i===currentPhotoIdx?'active':''}"></div>`).join('');
 }
 function nextPhoto(){ const v=photoUrls.filter(u=>u); currentPhotoIdx=(currentPhotoIdx+1)%v.length; renderPhotos(); }
 function prevPhoto(){ const v=photoUrls.filter(u=>u); currentPhotoIdx=(currentPhotoIdx-1+v.length)%v.length; renderPhotos(); }
 
 function toggleVoice(){
   if(!voiceAudio) return;
-  const btn = document.getElementById('playBtn');
+  const btn=document.getElementById('playBtn');
   if(!voiceAudio.paused){ voiceAudio.pause(); btn.textContent='▶'; clearInterval(voiceInterval); return; }
   voiceAudio.play(); btn.textContent='⏸';
-  voiceInterval = setInterval(()=>{
+  voiceInterval=setInterval(()=>{
     const pct=(voiceAudio.currentTime/(voiceAudio.duration||1))*100;
     document.getElementById('voiceProgressFill').style.width=pct+'%';
     const s=Math.floor(voiceAudio.currentTime);
@@ -848,7 +783,7 @@ function toggleVoice(){
   },100);
 }
 
-// ── MODALS
+// MODALS
 function openModal(type){
   if(type==='basic'){
     document.getElementById('edit-age').value=profileData.age||'';
@@ -861,7 +796,7 @@ function openModal(type){
   if(type==='photos'){
     modalPhotoUrls=[...photoUrls]; modalPhotoFiles=[null,null,null];
     [0,1,2].forEach(i=>{
-      const img=document.getElementById('mimg'+i), rem=document.getElementById('mrem'+i), slot=document.getElementById('mslot'+i);
+      const img=document.getElementById('mimg'+i),rem=document.getElementById('mrem'+i),slot=document.getElementById('mslot'+i);
       if(modalPhotoUrls[i]){ img.src=modalPhotoUrls[i]; img.style.display='block'; rem.style.display='flex'; slot.classList.add('filled'); }
       else { img.src=''; img.style.display='none'; rem.style.display='none'; slot.classList.remove('filled'); }
     });
@@ -871,7 +806,6 @@ function openModal(type){
 }
 function closeModal(type){ document.getElementById('modal-'+type).classList.remove('show'); }
 document.querySelectorAll('.modal-overlay').forEach(o=>{ o.addEventListener('click',function(e){ if(e.target===this) this.classList.remove('show'); }); });
-
 function selectEditGender(g){ editGender=g; document.getElementById('edit-gm').classList.toggle('sel',g==='male'); document.getElementById('edit-gf').classList.toggle('sel',g==='female'); }
 
 async function saveBasic(){
@@ -881,10 +815,10 @@ async function saveBasic(){
     const age=parseInt(document.getElementById('edit-age').value);
     const city=document.getElementById('edit-city').value;
     const intent=document.getElementById('edit-intent').value;
-    const genderChanged = editGender !== profileData.gender;
-    const updateData = { age, gender:editGender, city, intent };
+    const genderChanged=editGender!==profileData.gender;
+    const updateData={age,gender:editGender,city,intent};
     if(genderChanged){ updateData.status='pending'; updateData.onboarding_step=1; updateData.review_reason='gender_change'; }
-    const { error } = await db.from('profiles').update(updateData).eq('phone', phone);
+    const {error}=await db.from('profiles').update(updateData).eq('phone',phone);
     if(error) throw error;
     if(genderChanged){ window.location.href='pending.html'; return; }
     profileData.age=age; profileData.gender=editGender; profileData.city=city; profileData.intent=intent;
@@ -919,7 +853,7 @@ async function savePhotos(){
         const ext=modalPhotoFiles[i].name.split('.').pop();
         const path=`${phone}/photo${i+1}_${Date.now()}.${ext}`;
         await db.storage.from('Photos').upload(path,modalPhotoFiles[i],{upsert:true});
-        const { data } = db.storage.from('Photos').getPublicUrl(path);
+        const {data}=db.storage.from('Photos').getPublicUrl(path);
         finalUrls[i]=data.publicUrl;
       } else { finalUrls[i]=modalPhotoUrls[i]; }
     }
@@ -930,7 +864,6 @@ async function savePhotos(){
   btn.disabled=false; btn.textContent='Save photos';
 }
 
-// voice modal
 async function toggleModalRecording(){
   if(modalAudioBlob) return;
   if(!modalIsRecording){ await startModalRecording(); } else { stopModalRecording(); }
@@ -955,7 +888,7 @@ async function startModalRecording(){
     document.getElementById('modal-rec-status').textContent='Recording... tap to stop';
     modalTimer=setInterval(()=>{
       modalSecs--;
-      const m=Math.floor(modalSecs/60), s=modalSecs%60;
+      const m=Math.floor(modalSecs/60),s=modalSecs%60;
       document.getElementById('modal-timer').textContent=m+':'+String(s).padStart(2,'0');
       if(modalSecs<=0){ clearInterval(modalTimer); stopModalRecording(); }
     },1000);
@@ -992,7 +925,7 @@ async function saveVoice(){
   try {
     const path=`${phone}/voice_${Date.now()}.webm`;
     await db.storage.from('Voice').upload(path,modalAudioBlob,{upsert:true});
-    const { data } = db.storage.from('Voice').getPublicUrl(path);
+    const {data}=db.storage.from('Voice').getPublicUrl(path);
     await db.from('user_media').update({voice_url:data.publicUrl}).eq('user_id',profileData.user_id);
     mediaData.voice_url=data.publicUrl; voiceAudio=new Audio(data.publicUrl);
     document.getElementById('voicePlayer').style.display='flex';
@@ -1002,7 +935,6 @@ async function saveVoice(){
   btn.disabled=false; btn.textContent='Save voice note';
 }
 
-// questions modal
 function buildModalQuestions(){
   modalSelectedQ={};
   answersData.forEach(a=>{ const idx=QUESTIONS.indexOf(a.question); if(idx!==-1) modalSelectedQ[idx]=a.answer; });
@@ -1018,7 +950,7 @@ function buildModalQuestions(){
   updateModalQCounter();
 }
 function toggleModalQ(i,el){
-  const isSel=modalSelectedQ[i]!==undefined, count=Object.keys(modalSelectedQ).length;
+  const isSel=modalSelectedQ[i]!==undefined,count=Object.keys(modalSelectedQ).length;
   if(isSel){ delete modalSelectedQ[i]; el.style.border='1.5px solid rgba(245,237,232,0.1)'; el.style.background='rgba(245,237,232,0.02)'; document.getElementById('mqa'+i).style.display='none'; el.querySelector('div').style.marginBottom='0'; }
   else {
     if(count>=3){ showToast('Pick 3 max'); return; }
@@ -1047,15 +979,13 @@ async function saveQuestions(){
   btn.disabled=false; btn.textContent='Save answers';
 }
 
-// logout
 async function handleLogout(){ await db.auth.signOut(); localStorage.clear(); window.location.href='index.html'; }
 
-// toast
 function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
 
-// auto load match on start
-window.addEventListener('load', ()=>{
-  matchLoaded = true;
+// ── INIT
+window.addEventListener('load', async ()=>{
+  await fetchCurrentUserId();
   loadMatches();
 });
 </script>
