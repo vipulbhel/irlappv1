@@ -198,6 +198,9 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
 /* TOAST */
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--green);color:#080808;padding:10px 24px;border-radius:100px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;z-index:999;display:none;white-space:nowrap}
 .toast.show{display:block}
+
+@keyframes fadeout{from{opacity:1}to{opacity:0}}
+@keyframes heartpop{0%{transform:scale(0.5);opacity:0}60%{transform:scale(1.3)}100%{transform:scale(1);opacity:1}}
 </style>
 </head>
 <body>
@@ -626,22 +629,31 @@ async function handlePass(i){
 
 async function handleLike(i){
   const p = matchProfiles[i];
+  // show like animation on card
+  const card = document.getElementById('mc-'+i);
+  const anim = document.createElement('div');
+  anim.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:10;background:rgba(232,67,122,0.15);animation:fadeout 0.8s ease forwards;pointer-events:none';
+  anim.innerHTML = '<div style="font-size:80px;animation:heartpop 0.5s ease forwards">♥</div>';
+  if(card) card.appendChild(anim);
+  setTimeout(()=>{ if(anim.parentNode) anim.parentNode.removeChild(anim); }, 800);
+
   try {
     await db.from('interactions').insert({ from_user_id:profileData.user_id||userId, to_user_id:p.user_id, action:'like' });
     const myId = profileData.user_id||userId;
     const { data: mutual } = await db.from('interactions').select('id').eq('from_user_id',p.user_id).eq('to_user_id',myId).eq('action','like').limit(1);
     if(mutual && mutual.length > 0){
-      showToast('🎉 It\'s a match! Go to Chat.');
+      setTimeout(()=>showToast('🎉 It\'s a match! Go to Chat.'), 600);
     } else {
-      showToast('♥ Liked!');
+      setTimeout(()=>showToast('♥ Liked!'), 400);
     }
   } catch(e){ console.error(e); }
-  scrollToCard(i+1);
+  setTimeout(()=>scrollToCard(i+1), 600);
 }
 
 function scrollToCard(i){
-  const card = document.getElementById('mc-'+i);
-  if(card) card.scrollIntoView({behavior:'smooth',block:'nearest',inline:'start'});
+  const feed = document.getElementById('matchFeed');
+  const cardWidth = feed.offsetWidth;
+  feed.scrollTo({ left: cardWidth * i, behavior: 'smooth' });
 }
 
 function showUndoToast(){
