@@ -1054,14 +1054,34 @@ function hideUnmatchMenu(){ document.getElementById('unmatchMenu').classList.rem
 
 async function confirmUnmatch(){
   if(!currentMatch||!currentUserId) return;
+  const btn = document.querySelector('.unmatch-confirm-btn');
+  btn.textContent = 'Unmatching...';
+  btn.disabled = true;
   try {
-    await db.from('matches').update({status:'unmatched',unmatched_by:currentUserId,unmatched_at:new Date().toISOString()}).eq('id',currentMatch.id);
+    await db.from('matches').update({
+      status:'unmatched',
+      unmatched_by:currentUserId,
+      unmatched_at:new Date().toISOString()
+    }).eq('id',currentMatch.id);
     hideUnmatchMenu();
-    closeChat();
+    // stop polling
+    if(chatSubscription){ clearInterval(chatSubscription); chatSubscription=null; }
+    // close overlay
+    document.getElementById('chatOverlay').classList.remove('show');
+    currentMatch=null; currentMatchProfile=null;
+    // reset and reload chat list
     chatLoaded=false;
-    loadChatList();
+    document.getElementById('chatListItems').innerHTML='';
+    document.getElementById('chatListLoading').style.display='flex';
+    document.getElementById('chatListEmpty').style.display='none';
+    await loadChatList();
     showToast('Unmatched.');
-  } catch(e){ console.error('unmatch:',e); showToast('Error. Try again.'); }
+  } catch(e){
+    console.error('unmatch:',e);
+    showToast('Error. Try again.');
+  }
+  btn.textContent='Yes, unmatch';
+  btn.disabled=false;
 }
 
 // PROFILE TAB
