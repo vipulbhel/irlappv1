@@ -1003,33 +1003,34 @@ function autoResizeInput(el){
 }
 
 function subscribeToMessages(){
-  if(chatSubscription){ db.removeChannel(chatSubscription); chatSubscription=null; }
+  if(chatSubscription){ clearInterval(chatSubscription); chatSubscription=null; }
   const matchId = currentMatch.id;
-  chatSubscription = db.channel('room-'+matchId)
-    .on('postgres_changes',{
-      event:'INSERT',
-      schema:'public',
-      table:'messages'
-    },(payload)=>{
-      const msg = payload.new;
-      // only handle messages for current chat
-      if(msg.match_id !== matchId) return;
-      const container = document.getElementById('chatMessages');
-      // clear empty state
-      const emptyEl = container.querySelector('div[style*="Say hello"]') || container.querySelector('div[style*="height:100%"]');
-      if(emptyEl) container.innerHTML='';
-      const isMe = msg.from_user_id === currentUserId;
-      const wrap = document.createElement('div');
-      wrap.className = 'msg '+(isMe?'me':'them');
-      const time = new Date(msg.sent_at);
-      wrap.innerHTML = `<div class="msg-bubble">${escHtml(msg.message)}</div><div class="msg-time">${time.getHours()}:${String(time.getMinutes()).padStart(2,'0')}</div>`;
-      container.appendChild(wrap);
-      scrollChatToBottom();
-      if(!isMe) markMessagesRead();
-    })
-    .subscribe((status)=>{
-      console.log('Realtime status:', status);
-    });
+  let lastMsgId = 0;
+
+  // get latest message id we already have
+  const existing = document.querySelectorAll('.msg');
+  // poll every 2 seconds for new messages
+  chatSubscription = setInterval(async ()=>{
+    if(!currentMatch) return;
+    try {
+      const {data:msgs} = await db.from('messages')
+        .select('*')
+        .eq('match_id', matchId)
+        .order('sent_at',{ascending:false})
+        .limit(1);
+      if(!msgs || msgs.length===0) return;
+      const latest = msgs[0];
+      if(latest.id === lastMsgId) return;
+      // new message — reload all messages
+      lastMsgId = latest.id;
+      const {data:allMsgs} = await db.from('messages')
+        .select('*')
+        .eq('match_id', matchId)
+        .order('sent_at',{ascending:true});
+      renderMessages(allMsgs||[]);
+      if(latest.from_user_id !== currentUserId) markMessagesRead();
+    } catch(e){ console.error('poll error:',e); }
+  }, 2000);
 }
 
 async function markMessagesRead(){
@@ -1040,11 +1041,11 @@ async function markMessagesRead(){
   } catch(e){}
 }
 
-function closeChat(){
-  if(chatSubscription){ db.removeChannel(chatSubscription); chatSubscription=null; }
+  function closeChat(){
+  if(chatSubscription){ clearInterval(chatSubscription); chatSubscription=null; }
   document.getElementById('chatOverlay').classList.remove('show');
   currentMatch=null; currentMatchProfile=null;
-  chatLoaded=false; // refresh list next time
+  chatLoaded=false;
 }
 
 // UNMATCH
