@@ -1030,7 +1030,7 @@ function subscribeToMessages(){
       renderMessages(allMsgs||[]);
       if(latest.from_user_id !== currentUserId) markMessagesRead();
     } catch(e){ console.error('poll error:',e); }
-  }, 2000);
+  }, 1000);
 }
 
 async function markMessagesRead(){
