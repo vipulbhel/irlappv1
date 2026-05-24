@@ -27,9 +27,11 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
 
 /* BOTTOM NAV */
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;display:flex;background:rgba(13,8,16,0.95);backdrop-filter:blur(20px);border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom)}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 0;cursor:pointer;transition:color 0.2s;border:none;background:none;color:var(--muted2);gap:4px}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 0;cursor:pointer;transition:color 0.2s;border:none;background:none;color:var(--muted2);gap:4px;position:relative}
 .nav-item.active{color:var(--rose)}
 .nav-label{font-size:10px;font-weight:500;letter-spacing:0.3px}
+.nav-badge{position:absolute;top:6px;right:calc(50% - 16px);background:var(--rose);color:white;font-size:9px;font-weight:700;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;display:none}
+.nav-badge.show{display:flex}
 
 /* MATCH TAB */
 #tab-match{overflow:hidden;position:relative}
@@ -93,6 +95,80 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
 .undo-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(22,15,26,0.95);backdrop-filter:blur(16px);border:1px solid rgba(245,237,232,0.12);border-radius:100px;padding:10px 20px;display:none;align-items:center;gap:12px;font-size:13px;color:var(--cream);white-space:nowrap;z-index:300;box-shadow:0 4px 24px rgba(0,0,0,0.4)}
 .undo-toast.show{display:flex}
 .undo-link{color:var(--rose2);font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+
+/* ── CHAT TAB ── */
+#tab-chat{overflow-y:auto;padding:0}
+.chat-list{display:flex;flex-direction:column;padding:16px;gap:2px}
+.chat-list-header{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-0.5px;color:var(--cream);padding:8px 0 16px}
+.chat-row{display:flex;align-items:center;gap:14px;padding:12px;border-radius:16px;cursor:pointer;transition:background 0.2s;position:relative}
+.chat-row:hover{background:rgba(245,237,232,0.04)}
+.chat-avatar{width:52px;height:52px;border-radius:50%;object-fit:cover;flex-shrink:0;background:var(--muted2)}
+.chat-avatar-placeholder{width:52px;height:52px;border-radius:50%;background:var(--muted2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.chat-info{flex:1;min-width:0}
+.chat-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--cream);margin-bottom:3px}
+.chat-name.unread{color:white}
+.chat-preview{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4}
+.chat-preview.unread{color:var(--cream);font-weight:500}
+.chat-time{font-size:11px;color:var(--muted2);flex-shrink:0;text-align:right}
+.chat-unread-dot{width:8px;height:8px;border-radius:50%;background:var(--rose);flex-shrink:0;display:none}
+.chat-unread-dot.show{display:block}
+.chat-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:40px 32px}
+
+/* ── CHAT WINDOW OVERLAY ── */
+.chat-overlay{position:fixed;inset:0;z-index:200;background:var(--bg);display:none;flex-direction:column}
+.chat-overlay.show{display:flex}
+
+/* chat top bar */
+.chat-topbar{display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(13,8,16,0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);flex-shrink:0}
+.chat-back{background:rgba(245,237,232,0.06);border:1px solid var(--border);border-radius:10px;padding:7px 14px;font-size:13px;color:var(--cream);cursor:pointer;font-family:'DM Sans',sans-serif;flex-shrink:0}
+.chat-topbar-avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;background:var(--muted2)}
+.chat-topbar-info{flex:1;min-width:0}
+.chat-topbar-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--cream);line-height:1}
+.chat-topbar-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.chat-menu-btn{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px;flex-shrink:0}
+
+/* messages area */
+.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.chat-messages::-webkit-scrollbar{display:none}
+
+/* message bubbles */
+.msg{display:flex;flex-direction:column;max-width:75%}
+.msg.me{align-self:flex-end;align-items:flex-end}
+.msg.them{align-self:flex-start;align-items:flex-start}
+.msg-bubble{padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.5;word-break:break-word}
+.msg.me .msg-bubble{background:var(--rose);color:white;border-bottom-right-radius:4px}
+.msg.them .msg-bubble{background:var(--card);border:1px solid var(--border);color:var(--cream);border-bottom-left-radius:4px}
+.msg-time{font-size:10px;color:var(--muted2);margin-top:3px;padding:0 4px}
+.msg-date-divider{align-self:center;font-size:11px;color:var(--muted2);background:rgba(245,237,232,0.04);border-radius:100px;padding:4px 12px;margin:8px 0}
+
+/* typing indicator */
+.typing-indicator{display:none;align-self:flex-start}
+.typing-indicator.show{display:flex}
+.typing-bubble{background:var(--card);border:1px solid var(--border);border-radius:18px;border-bottom-left-radius:4px;padding:10px 14px;display:flex;gap:4px;align-items:center}
+.typing-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:typing 1.2s infinite}
+.typing-dot:nth-child(1){animation-delay:0s}
+.typing-dot:nth-child(2){animation-delay:0.2s}
+.typing-dot:nth-child(3){animation-delay:0.4s}
+@keyframes typing{0%,60%,100%{transform:translateY(0);opacity:0.4}30%{transform:translateY(-4px);opacity:1}}
+
+/* message input */
+.chat-input-bar{display:flex;align-items:flex-end;gap:10px;padding:12px 16px;background:rgba(13,8,16,0.95);border-top:1px solid var(--border);flex-shrink:0}
+.chat-input{flex:1;background:rgba(245,237,232,0.06);border:1px solid rgba(245,237,232,0.1);border-radius:20px;padding:10px 16px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--cream);outline:none;resize:none;max-height:100px;line-height:1.5;-webkit-appearance:none}
+.chat-input::placeholder{color:var(--muted2)}
+.chat-input:focus{border-color:rgba(232,67,122,0.4)}
+.chat-send{width:40px;height:40px;border-radius:50%;background:var(--rose);border:none;color:white;font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.2s;box-shadow:0 4px 12px rgba(232,67,122,0.3)}
+.chat-send:hover{transform:scale(1.05)}
+.chat-send:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+
+/* unmatch menu */
+.unmatch-menu{position:fixed;inset:0;z-index:300;display:none;align-items:flex-end;justify-content:center;background:rgba(13,8,16,0.8);backdrop-filter:blur(8px)}
+.unmatch-menu.show{display:flex}
+.unmatch-sheet{background:var(--card);border:1px solid var(--border);border-radius:24px 24px 0 0;padding:28px 24px 40px;width:100%;max-width:500px}
+.unmatch-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--cream);margin-bottom:6px}
+.unmatch-sub{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:24px}
+.unmatch-confirm-btn{width:100%;background:rgba(232,67,122,0.1);border:1.5px solid rgba(232,67,122,0.3);border-radius:13px;padding:16px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--rose2);cursor:pointer;margin-bottom:10px;transition:all 0.2s}
+.unmatch-confirm-btn:hover{background:rgba(232,67,122,0.2)}
+.unmatch-cancel-btn{width:100%;background:transparent;border:1px solid var(--border);border-radius:13px;padding:16px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--muted);cursor:pointer;transition:all 0.2s}
 
 /* EVENTS TAB */
 #tab-events{overflow-y:auto}
@@ -214,10 +290,17 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
 
   <!-- CHAT TAB -->
   <div class="tab-pane" id="tab-chat">
-    <div class="match-center">
-      <div style="font-size:48px;margin-bottom:16px">💬</div>
-      <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-0.5px;margin-bottom:8px">No matches yet.</div>
-      <div style="font-size:14px;color:var(--muted);line-height:1.6;max-width:260px">When you match with someone your conversations will show up here.</div>
+    <div class="chat-list" id="chatList">
+      <div class="chat-list-header">Messages</div>
+      <div id="chatListLoading" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;gap:12px">
+        <div class="dots-loader"><span></span><span></span><span></span></div>
+      </div>
+      <div id="chatListEmpty" style="display:none;text-align:center;padding:40px 24px">
+        <div style="font-size:40px;margin-bottom:12px">💬</div>
+        <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;letter-spacing:-0.3px;margin-bottom:6px">No matches yet.</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.6">Match with someone to start a conversation.</div>
+      </div>
+      <div id="chatListItems"></div>
     </div>
   </div>
 
@@ -299,7 +382,10 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
     <span class="nav-label">Match</span>
   </button>
   <button class="nav-item" id="nav-chat" onclick="switchTab('chat')">
-    <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+    <span class="nav-icon" style="position:relative">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span class="nav-badge" id="chatBadge"></span>
+    </span>
     <span class="nav-label">Chat</span>
   </button>
   <button class="nav-item" id="nav-events" onclick="switchTab('events')">
@@ -333,6 +419,40 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
   <div class="fp-actions">
     <button class="mc-pass" id="fpPassBtn" onclick="handleFPPass()">✕ Pass</button>
     <button class="mc-like" id="fpLikeBtn" onclick="handleFPLike()">♥ Like</button>
+  </div>
+</div>
+
+<!-- CHAT WINDOW OVERLAY -->
+<div class="chat-overlay" id="chatOverlay">
+  <div class="chat-topbar">
+    <button class="chat-back" onclick="closeChat()">← Back</button>
+    <img class="chat-topbar-avatar" id="chatTopAvatar" src="" alt=""/>
+    <div class="chat-topbar-info">
+      <div class="chat-topbar-name" id="chatTopName">—</div>
+      <div class="chat-topbar-sub" id="chatTopSub">IRL match</div>
+    </div>
+    <button class="chat-menu-btn" onclick="showUnmatchMenu()">⋯</button>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div id="chatMsgLoading" style="display:flex;justify-content:center;padding:20px">
+      <div class="dots-loader"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+  <div class="chat-input-bar">
+    <textarea class="chat-input" id="chatInput" placeholder="Say something..." rows="1" onkeydown="handleChatKey(event)" oninput="autoResizeInput(this)"></textarea>
+    <button class="chat-send" id="chatSendBtn" onclick="sendMessage()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- UNMATCH MENU -->
+<div class="unmatch-menu" id="unmatchMenu" onclick="if(event.target===this)hideUnmatchMenu()">
+  <div class="unmatch-sheet">
+    <div class="unmatch-title" id="unmatchTitle">Unmatch with —?</div>
+    <div class="unmatch-sub">This will remove your match and delete the conversation. This cannot be undone.</div>
+    <button class="unmatch-confirm-btn" onclick="confirmUnmatch()">Yes, unmatch</button>
+    <button class="unmatch-cancel-btn" onclick="hideUnmatchMenu()">Cancel</button>
   </div>
 </div>
 
@@ -416,7 +536,6 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;mi
 </div>
 
 <script>
-// ── SUPABASE
 const { createClient } = window.supabase;
 const db = createClient(
   'https://sxpbdkamagunvktdkogw.supabase.co',
@@ -428,18 +547,7 @@ const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZ
 const phone = localStorage.getItem('irl_phone');
 if(!phone){ window.location.href='index.html'; }
 
-// ── CURRENT USER ID — fetched fresh from DB
 let currentUserId = null;
-
-async function fetchCurrentUserId(){
-  try {
-    const { data } = await db.from('profiles').select('user_id').eq('phone', phone).limit(1);
-    if(data && data.length > 0) currentUserId = data[0].user_id;
-    console.log('currentUserId:', currentUserId);
-  } catch(e){ console.error('fetchUserId:', e); }
-}
-
-// ── STATE
 let profileData = {}, mediaData = {}, answersData = [];
 let currentPhotoIdx = 0, photoUrls = [null,null,null];
 let modalPhotoFiles = [null,null,null], modalPhotoUrls = [null,null,null];
@@ -454,6 +562,13 @@ let cardAudios = {};
 let lastPassedProfile = null, undoTimer = null;
 let profileLoaded = false;
 
+// chat state
+let myMatches = [];
+let currentMatch = null;
+let currentMatchProfile = null;
+let chatSubscription = null;
+let chatLoaded = false;
+
 const QUESTIONS = [
   "What does your ideal Sunday look like?",
   "What are you actually looking for right now, honestly?",
@@ -464,6 +579,13 @@ const QUESTIONS = [
 ];
 let modalSelectedQ = {};
 
+async function fetchCurrentUserId(){
+  try {
+    const { data } = await db.from('profiles').select('user_id').eq('phone', phone).limit(1);
+    if(data && data.length > 0) currentUserId = data[0].user_id;
+  } catch(e){ console.error('fetchUserId:', e); }
+}
+
 // ── TAB SWITCHING
 function switchTab(tab){
   document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
@@ -471,6 +593,7 @@ function switchTab(tab){
   document.getElementById('tab-'+tab).classList.add('active');
   document.getElementById('nav-'+tab).classList.add('active');
   if(tab==='profile' && !profileLoaded){ profileLoaded=true; loadProfile(); }
+  if(tab==='chat' && !chatLoaded){ chatLoaded=true; loadChatList(); }
 }
 
 // ── MATCH
@@ -482,16 +605,15 @@ async function loadMatches(){
       body: JSON.stringify({phone})
     });
     const data = await res.json();
-    console.log('match response:', data);
     matchProfiles = data.profiles || [];
     document.getElementById('matchLoading').style.display='none';
-    if(matchProfiles.length === 0){
+    if(matchProfiles.length===0){
       document.getElementById('matchEmpty').style.display='flex';
     } else {
       renderMatchFeed();
     }
   } catch(err){
-    console.error('loadMatches error:', err);
+    console.error('loadMatches:', err);
     document.getElementById('matchLoading').style.display='none';
     document.getElementById('matchEmpty').style.display='flex';
   }
@@ -499,10 +621,10 @@ async function loadMatches(){
 
 function renderMatchFeed(){
   const feed = document.getElementById('matchFeed');
-  feed.innerHTML = '';
+  feed.innerHTML='';
   matchProfiles.forEach((p,i)=>{
-    const photos = [p.photo_1,p.photo_2,p.photo_3].filter(Boolean);
-    const card = document.createElement('div');
+    const photos=[p.photo_1,p.photo_2,p.photo_3].filter(Boolean);
+    const card=document.createElement('div');
     card.className='match-card'; card.id='mc-'+i;
     card.innerHTML=`
       <div class="mc-photo" onclick="openFP(${i})">
@@ -539,18 +661,16 @@ function renderMatchFeed(){
 
 function scrollToCard(i){
   if(i >= matchProfiles.length){
-    // no more profiles — show empty state
     document.getElementById('matchFeed').style.display='none';
     document.getElementById('matchEmpty').style.display='flex';
     return;
   }
-  const feed = document.getElementById('matchFeed');
-  feed.scrollTo({ left: feed.offsetWidth * i, behavior:'smooth' });
+  const feed=document.getElementById('matchFeed');
+  feed.scrollTo({left:feed.offsetWidth*i,behavior:'smooth'});
 }
 
 function toggleCardVoice(i){
-  const p = matchProfiles[i];
-  if(!p||!p.voice_url) return;
+  const p=matchProfiles[i]; if(!p||!p.voice_url) return;
   const btn=document.getElementById('mcplay-'+i);
   const waves=document.getElementById('mcwaves-'+i);
   Object.keys(cardAudios).forEach(k=>{
@@ -575,24 +695,19 @@ function toggleCardVoice(i){
 }
 
 async function handlePass(i){
-  // disable both buttons immediately
   const passBtn=document.getElementById('pass-'+i);
   const likeBtn=document.getElementById('like-'+i);
   if(passBtn) passBtn.disabled=true;
   if(likeBtn) likeBtn.disabled=true;
-
   const p=matchProfiles[i];
   lastPassedProfile={profile:p,index:i};
-
   try {
-    console.log('inserting pass, currentUserId:', currentUserId, 'to:', p.user_id);
-    const {error} = await db.from('interactions').insert({from_user_id:currentUserId, to_user_id:p.user_id, action:'pass'});
-    if(error) console.error('pass insert error:', error);
-  } catch(e){ console.error('pass error:', e); }
-
+    const {error}=await db.from('interactions').insert({from_user_id:currentUserId,to_user_id:p.user_id,action:'pass'});
+    if(error) console.error('pass error:',error);
+  } catch(e){ console.error(e); }
   document.getElementById('undoText').textContent='Passed on '+(p.full_name||'them');
   showUndoToast();
-  setTimeout(()=>scrollToCard(i+1), 400);
+  setTimeout(()=>scrollToCard(i+1),400);
 }
 
 async function handleLike(i){
@@ -600,75 +715,55 @@ async function handleLike(i){
   const likeBtn=document.getElementById('like-'+i);
   if(passBtn) passBtn.disabled=true;
   if(likeBtn) likeBtn.disabled=true;
-
   const p=matchProfiles[i];
-
-  // heart animation
   const card=document.getElementById('mc-'+i);
   const anim=document.createElement('div');
   anim.style.cssText='position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:10;background:rgba(232,67,122,0.15);animation:fadeout 0.8s ease forwards;pointer-events:none';
   anim.innerHTML='<div style="font-size:80px;animation:heartpop 0.5s ease forwards;color:var(--rose)">♥</div>';
   if(card) card.appendChild(anim);
   setTimeout(()=>{ if(anim.parentNode) anim.parentNode.removeChild(anim); },800);
-
   try {
-    console.log('inserting like, currentUserId:', currentUserId, 'to:', p.user_id);
-    const {error} = await db.from('interactions').insert({from_user_id:currentUserId, to_user_id:p.user_id, action:'like'});
-    if(error){ console.error('like insert error:', error); }
+    const {error}=await db.from('interactions').insert({from_user_id:currentUserId,to_user_id:p.user_id,action:'like'});
+    if(error){ console.error('like error:',error); }
     else {
-      const {data:mutual} = await db.from('interactions').select('id').eq('from_user_id',p.user_id).eq('to_user_id',currentUserId).eq('action','like').limit(1);
-     if(mutual && mutual.length>0){
-  // create match row
-  await db.from('matches').insert({
-    user_id_1: currentUserId,
-    user_id_2: p.user_id,
-    status: 'active'
-  });
-  setTimeout(()=>showToast('🎉 It\'s a match! Go to Chat.'),600);
-} else {
-  setTimeout(()=>showToast('♥ Liked!'),400);
-}
+      const {data:mutual}=await db.from('interactions').select('id').eq('from_user_id',p.user_id).eq('to_user_id',currentUserId).eq('action','like').limit(1);
+      if(mutual && mutual.length>0){
+        await db.from('matches').insert({user_id_1:currentUserId,user_id_2:p.user_id,status:'active'});
+        setTimeout(()=>showToast('🎉 It\'s a match! Go to Chat.'),600);
+        // refresh chat list badge
+        loadChatBadge();
+      } else {
+        setTimeout(()=>showToast('♥ Liked!'),400);
+      }
     }
-  } catch(e){ console.error('like error:', e); }
-
+  } catch(e){ console.error(e); }
   setTimeout(()=>scrollToCard(i+1),700);
 }
 
 function showUndoToast(){
   clearTimeout(undoTimer);
-  const t = document.getElementById('undoToast');
+  const t=document.getElementById('undoToast');
   t.classList.add('show');
-  undoTimer = setTimeout(()=>{
-    t.classList.remove('show');
-    lastPassedProfile = null;
-  }, 5000);
+  undoTimer=setTimeout(()=>{ t.classList.remove('show'); lastPassedProfile=null; },5000);
 }
 
 async function undoLastPass(){
-  if(!lastPassedProfile){ return; }
+  if(!lastPassedProfile) return;
   clearTimeout(undoTimer);
   document.getElementById('undoToast').classList.remove('show');
   try {
-    await db.from('interactions').delete()
-      .eq('from_user_id', currentUserId)
-      .eq('to_user_id', lastPassedProfile.profile.user_id)
-      .eq('action', 'pass');
-
-    // re-enable buttons
-    const undoPass = document.getElementById('pass-'+lastPassedProfile.index);
-    const undoLike = document.getElementById('like-'+lastPassedProfile.index);
-    if(undoPass) undoPass.disabled = false;
-    if(undoLike) undoLike.disabled = false;
-
-    // if empty state was showing, hide it and show feed again
-    document.getElementById('matchEmpty').style.display = 'none';
-    document.getElementById('matchFeed').style.display = 'flex';
-
-    setTimeout(()=>scrollToCard(lastPassedProfile.index), 100);
+    await db.from('interactions').delete().eq('from_user_id',currentUserId).eq('to_user_id',lastPassedProfile.profile.user_id).eq('action','pass');
+    const undoPass=document.getElementById('pass-'+lastPassedProfile.index);
+    const undoLike=document.getElementById('like-'+lastPassedProfile.index);
+    if(undoPass) undoPass.disabled=false;
+    if(undoLike) undoLike.disabled=false;
+    document.getElementById('matchEmpty').style.display='none';
+    document.getElementById('matchFeed').style.display='flex';
+    setTimeout(()=>scrollToCard(lastPassedProfile.index),100);
   } catch(e){ console.error(e); }
-  lastPassedProfile = null;
+  lastPassedProfile=null;
 }
-  
+
 // FULL PROFILE
 function openFP(i){
   fpProfile=matchProfiles[i];
@@ -732,14 +827,232 @@ function closeFP(){
 }
 
 function handleFPPass(){
-  const idx=matchProfiles.indexOf(fpProfile);
-  closeFP();
+  const idx=matchProfiles.indexOf(fpProfile); closeFP();
   if(idx!==-1) setTimeout(()=>handlePass(idx),300);
 }
 function handleFPLike(){
-  const idx=matchProfiles.indexOf(fpProfile);
-  closeFP();
+  const idx=matchProfiles.indexOf(fpProfile); closeFP();
   if(idx!==-1) setTimeout(()=>handleLike(idx),300);
+}
+
+// ── CHAT LIST
+async function loadChatList(){
+  if(!currentUserId) return;
+  try {
+    // get all active matches where I am either user_id_1 or user_id_2
+    const {data:m1}=await db.from('matches').select('*').eq('user_id_1',currentUserId).eq('status','active');
+    const {data:m2}=await db.from('matches').select('*').eq('user_id_2',currentUserId).eq('status','active');
+    myMatches=[...(m1||[]),...(m2||[])];
+
+    document.getElementById('chatListLoading').style.display='none';
+
+    if(myMatches.length===0){
+      document.getElementById('chatListEmpty').style.display='block';
+      return;
+    }
+
+    // for each match get the other person's profile + last message
+    const items=document.getElementById('chatListItems');
+    items.innerHTML='';
+    for(const match of myMatches){
+      const otherUserId = match.user_id_1===currentUserId ? match.user_id_2 : match.user_id_1;
+      const {data:prof}=await db.from('profiles').select('full_name,user_id').eq('user_id',otherUserId).limit(1);
+      const {data:media}=await db.from('user_media').select('photo_1').eq('user_id',otherUserId).limit(1);
+      const {data:msgs}=await db.from('messages').select('*').eq('match_id',match.id).order('sent_at',{ascending:false}).limit(1);
+      const {data:unread}=await db.from('messages').select('id').eq('match_id',match.id).eq('from_user_id',otherUserId).eq('is_read',false);
+
+      const name=prof?.[0]?.full_name||'—';
+      const photo=media?.[0]?.photo_1||'';
+      const lastMsg=msgs?.[0]?.message||'Say hi 👋';
+      const lastTime=msgs?.[0]?.sent_at?formatTime(msgs[0].sent_at):'';
+      const hasUnread=(unread||[]).length>0;
+
+      const row=document.createElement('div');
+      row.className='chat-row';
+      row.onclick=()=>openChat(match,{full_name:name,photo_1:photo,user_id:otherUserId});
+      row.innerHTML=`
+        ${photo?`<img class="chat-avatar" src="${photo}" alt=""/>`:`<div class="chat-avatar-placeholder">😊</div>`}
+        <div class="chat-info">
+          <div class="chat-name ${hasUnread?'unread':''}">${name}</div>
+          <div class="chat-preview ${hasUnread?'unread':''}">${lastMsg}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
+          <div class="chat-time">${lastTime}</div>
+          <div class="chat-unread-dot ${hasUnread?'show':''}"></div>
+        </div>`;
+      items.appendChild(row);
+    }
+    loadChatBadge();
+  } catch(e){ console.error('loadChatList:',e); }
+}
+
+async function loadChatBadge(){
+  if(!currentUserId) return;
+  try {
+    const {data:m1}=await db.from('matches').select('id').eq('user_id_1',currentUserId).eq('status','active');
+    const {data:m2}=await db.from('matches').select('id').eq('user_id_2',currentUserId).eq('status','active');
+    const matchIds=[...(m1||[]),...(m2||[])].map(m=>m.id);
+    if(matchIds.length===0) return;
+    const {data:unread}=await db.from('messages').select('id').in('match_id',matchIds).neq('from_user_id',currentUserId).eq('is_read',false);
+    const count=(unread||[]).length;
+    const badge=document.getElementById('chatBadge');
+    if(count>0){ badge.textContent=count>9?'9+':count; badge.classList.add('show'); }
+    else { badge.classList.remove('show'); }
+  } catch(e){}
+}
+
+function formatTime(ts){
+  const d=new Date(ts);
+  const now=new Date();
+  const diff=now-d;
+  if(diff<60000) return 'now';
+  if(diff<3600000) return Math.floor(diff/60000)+'m';
+  if(diff<86400000) return d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');
+  return d.getDate()+'/'+(d.getMonth()+1);
+}
+
+// ── CHAT WINDOW
+async function openChat(match, otherProfile){
+  currentMatch=match;
+  currentMatchProfile=otherProfile;
+
+  document.getElementById('chatTopName').textContent=otherProfile.full_name||'—';
+  document.getElementById('chatTopSub').textContent='IRL match';
+  const avatar=document.getElementById('chatTopAvatar');
+  if(otherProfile.photo_1){ avatar.src=otherProfile.photo_1; avatar.style.display='block'; }
+  else { avatar.style.display='none'; }
+
+  document.getElementById('unmatchTitle').textContent='Unmatch with '+(otherProfile.full_name||'them')+'?';
+
+  document.getElementById('chatOverlay').classList.add('show');
+  document.getElementById('chatMessages').innerHTML='<div id="chatMsgLoading" style="display:flex;justify-content:center;padding:20px"><div class="dots-loader"><span></span><span></span><span></span></div></div>';
+
+  await loadMessages();
+  markMessagesRead();
+  subscribeToMessages();
+}
+
+async function loadMessages(){
+  try {
+    const {data:msgs}=await db.from('messages').select('*').eq('match_id',currentMatch.id).order('sent_at',{ascending:true});
+    renderMessages(msgs||[]);
+  } catch(e){ console.error('loadMessages:',e); }
+}
+
+function renderMessages(msgs){
+  const container=document.getElementById('chatMessages');
+  container.innerHTML='';
+  if(msgs.length===0){
+    container.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:32px"><div style="font-size:36px;margin-bottom:12px">👋</div><div style="font-size:14px;color:var(--muted);line-height:1.6">You matched! Say hello.</div></div>';
+    return;
+  }
+  let lastDate='';
+  msgs.forEach(msg=>{
+    const isMe=msg.from_user_id===currentUserId;
+    const msgDate=new Date(msg.sent_at).toDateString();
+    if(msgDate!==lastDate){
+      lastDate=msgDate;
+      const div=document.createElement('div');
+      div.className='msg-date-divider';
+      div.textContent=formatDateLabel(msg.sent_at);
+      container.appendChild(div);
+    }
+    const wrap=document.createElement('div');
+    wrap.className='msg '+(isMe?'me':'them');
+    const time=new Date(msg.sent_at);
+    wrap.innerHTML=`<div class="msg-bubble">${escHtml(msg.message)}</div><div class="msg-time">${time.getHours()}:${String(time.getMinutes()).padStart(2,'0')}</div>`;
+    container.appendChild(wrap);
+  });
+  scrollChatToBottom();
+}
+
+function escHtml(str){ return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function formatDateLabel(ts){
+  const d=new Date(ts);
+  const now=new Date();
+  const diff=now-d;
+  if(diff<86400000) return 'Today';
+  if(diff<172800000) return 'Yesterday';
+  return d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear();
+}
+
+function scrollChatToBottom(){
+  const c=document.getElementById('chatMessages');
+  setTimeout(()=>{ c.scrollTop=c.scrollHeight; },100);
+}
+
+async function sendMessage(){
+  const input=document.getElementById('chatInput');
+  const text=input.value.trim();
+  if(!text||!currentMatch||!currentUserId) return;
+  input.value='';
+  autoResizeInput(input);
+  try {
+    await db.from('messages').insert({match_id:currentMatch.id,from_user_id:currentUserId,message:text,is_read:false});
+  } catch(e){ console.error('sendMessage:',e); }
+}
+
+function handleChatKey(e){
+  if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendMessage(); }
+}
+
+function autoResizeInput(el){
+  el.style.height='auto';
+  el.style.height=Math.min(el.scrollHeight,100)+'px';
+}
+
+function subscribeToMessages(){
+  if(chatSubscription){ db.removeChannel(chatSubscription); }
+  chatSubscription=db.channel('messages-'+currentMatch.id)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'match_id=eq.'+currentMatch.id},(payload)=>{
+      const msg=payload.new;
+      const container=document.getElementById('chatMessages');
+      // remove empty state if present
+      if(container.querySelector('.msg')===null && container.querySelector('.msg-date-divider')===null){
+        container.innerHTML='';
+      }
+      const isMe=msg.from_user_id===currentUserId;
+      const wrap=document.createElement('div');
+      wrap.className='msg '+(isMe?'me':'them');
+      const time=new Date(msg.sent_at);
+      wrap.innerHTML=`<div class="msg-bubble">${escHtml(msg.message)}</div><div class="msg-time">${time.getHours()}:${String(time.getMinutes()).padStart(2,'0')}</div>`;
+      container.appendChild(wrap);
+      scrollChatToBottom();
+      if(!isMe) markMessagesRead();
+    })
+    .subscribe();
+}
+
+async function markMessagesRead(){
+  if(!currentMatch||!currentUserId) return;
+  try {
+    await db.from('messages').update({is_read:true}).eq('match_id',currentMatch.id).neq('from_user_id',currentUserId).eq('is_read',false);
+    loadChatBadge();
+  } catch(e){}
+}
+
+function closeChat(){
+  if(chatSubscription){ db.removeChannel(chatSubscription); chatSubscription=null; }
+  document.getElementById('chatOverlay').classList.remove('show');
+  currentMatch=null; currentMatchProfile=null;
+  chatLoaded=false; // refresh list next time
+}
+
+// UNMATCH
+function showUnmatchMenu(){ document.getElementById('unmatchMenu').classList.add('show'); }
+function hideUnmatchMenu(){ document.getElementById('unmatchMenu').classList.remove('show'); }
+
+async function confirmUnmatch(){
+  if(!currentMatch||!currentUserId) return;
+  try {
+    await db.from('matches').update({status:'unmatched',unmatched_by:currentUserId,unmatched_at:new Date().toISOString()}).eq('id',currentMatch.id);
+    hideUnmatchMenu();
+    closeChat();
+    chatLoaded=false;
+    loadChatList();
+    showToast('Unmatched.');
+  } catch(e){ console.error('unmatch:',e); showToast('Error. Try again.'); }
 }
 
 // PROFILE TAB
@@ -1004,13 +1317,13 @@ async function saveQuestions(){
 }
 
 async function handleLogout(){ await db.auth.signOut(); localStorage.clear(); window.location.href='index.html'; }
-
 function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
 
-// ── INIT
+// INIT
 window.addEventListener('load', async ()=>{
   await fetchCurrentUserId();
   loadMatches();
+  loadChatBadge();
 });
 </script>
 </body>
